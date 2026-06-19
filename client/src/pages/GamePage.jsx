@@ -128,8 +128,8 @@ export default function GamePage() {
 
     socket.on("players_updated", ({ players }) => setPlayers(players));
 
-    socket.on("player_joined", ({ username }) => {
-      toast(`${username} joined! 👋`, { icon:"🟢" });
+    socket.on("player_joined", ({ player }) => {
+      toast(`${player?.username || "Someone"} joined! 👋`, { icon:"🟢" });
     });
 
     socket.on("player_left", ({ username }) => {
