@@ -4,13 +4,13 @@ export default function QuizDisplay({ imageUrl, seconds }) {
   const timerColor = seconds <= 5 ? "#E63946" : seconds <= 10 ? "#FF9F1C" : "rgb(6, 214, 160)";
 
   return (
-    <div className="relative flex-1 rounded-[24px] overflow-hidden flex items-center justify-center p-6"
+    <div className="relative flex-1 rounded-[24px] overflow-hidden flex items-center justify-center p-4"
       style={{
         border: "3.5px solid #6dd5a8",
         background: "rgba(255, 255, 255, 0.12)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        minHeight: "420px",
+        minHeight: "460px",
       }}>
 
       {/* 1. Jungle Decorations Frame Overlay (Inside card boundaries, behind the animal image) */}
@@ -24,12 +24,12 @@ export default function QuizDisplay({ imageUrl, seconds }) {
       />
 
       {/* 2. Animal Image (Layered in front of the jungle frame, padded to prevent overlay clipping) */}
-      <div className="relative z-10 w-full h-full flex items-center justify-center" style={{ maxHeight: "380px" }}>
+      <div className="relative z-10 w-full h-full flex items-center justify-center" style={{ maxHeight: "440px" }}>
         {imageUrl ? (
           <img
             src={imageUrl}
             alt="Guess the animal"
-            className="max-w-[95%] max-h-[95%] object-contain pop-in"
+            className="max-w-[98%] max-h-[98%] object-contain pop-in"
             style={{
               filter: "drop-shadow(0px 8px 24px rgba(0, 0, 0, 0.45))",
             }}

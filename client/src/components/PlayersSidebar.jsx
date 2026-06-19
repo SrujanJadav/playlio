@@ -9,12 +9,13 @@ export default function PlayersSidebar({ players, currentDrawerId, scores }) {
     <div className="rounded-2xl overflow-hidden glass-panel h-full flex flex-col"
       style={{
         border:"1.5px solid rgba(255, 255, 255, 0.35)",
-        background: "transparent",
-        backdropFilter: "none",
+        background: "rgba(10, 6, 18, 0.82)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
       }}>
       
       <div className="px-4 py-3 font-display text-base"
-        style={{ background:"rgba(255, 255, 255, 0.03)", color:"#f0e0ff", borderBottom:"1.5px solid rgba(255, 255, 255, 0.2)" }}>
+        style={{ background:"rgba(255, 255, 255, 0.05)", color:"#f0e0ff", borderBottom:"1.5px solid rgba(255, 255, 255, 0.2)" }}>
         🧑‍🤝‍🧑 Players ({players.length})
       </div>
 
@@ -28,8 +29,16 @@ export default function PlayersSidebar({ players, currentDrawerId, scores }) {
             <div key={p.userId || p.socketId}
               className="flex items-center gap-2 px-3 py-2 rounded-xl"
               style={{
-                background: isDrawer ? "rgba(240, 200, 64, 0.15)" : i === 0 ? "rgba(57, 255, 136, 0.15)" : "transparent",
-                border: isDrawer ? "1.5px solid #f0c840" : i === 0 ? "1.5px solid #39ff88" : "1.5px solid rgba(255, 255, 255, 0.1)",
+                background: isDrawer 
+                  ? "rgba(240, 200, 64, 0.22)" 
+                  : i === 0 
+                    ? "rgba(57, 255, 136, 0.22)" 
+                    : "rgba(255, 255, 255, 0.08)",
+                border: isDrawer 
+                  ? "1.5px solid #f0c840" 
+                  : i === 0 
+                    ? "1.5px solid #39ff88" 
+                    : "1.5px solid rgba(255, 255, 255, 0.15)",
               }}>
               
               <span className="text-base w-5 text-center">
@@ -42,8 +51,8 @@ export default function PlayersSidebar({ players, currentDrawerId, scores }) {
                 className="w-7 h-7 rounded-full flex-shrink-0"
                 style={{ border: isDrawer ? "1.5px solid #f0c840" : i === 0 ? "1.5px solid #39ff88" : "1.5px solid rgba(255, 255, 255, 0.2)" }} />
               
-              <span className="flex-1 font-body text-sm font-700 truncate"
-                style={{ color:"#f0e0ff" }}>
+              <span className="flex-1 font-body text-sm font-bold truncate"
+                style={{ color:"#f0e0ff", textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
                 {p.username}
               </span>
               
