@@ -501,11 +501,12 @@ export default function GamePage() {
             variant="heart"
           />
         ) : room?.category === "kids" ? (
-          <div className="absolute inset-0 z-0 opacity-25"
+          <div className="absolute inset-0 z-0"
             style={{
               backgroundImage: `url(${safariBg})`,
-              backgroundRepeat: "repeat",
-              backgroundSize: "240px 240px",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
         ) : (
