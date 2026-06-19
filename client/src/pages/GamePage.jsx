@@ -11,7 +11,7 @@ import AlbumRevealOverlay from "../components/AlbumRevealOverlay";
 import CouplesQuizDisplay from "../components/CouplesQuizDisplay";
 import ChatBox from "../components/ChatBox";
 import PlayersSidebar from "../components/PlayersSidebar";
-import BackgroundMusic from "../components/BackgroundMusic";
+import BackgroundMusic, { useBgm } from "../components/BackgroundMusic";
 import Silk from "../components/Silk";
 import Particles from "../components/Particles";
 import GridScan from "../components/GridScan";
@@ -92,6 +92,8 @@ export default function GamePage() {
   const isKidsMode = room?.category === "kids";
   const isMusicMode = room?.category === "music";
   const isCouplesMode = room?.category === "couples";
+
+  const { playing: bgmPlaying, toggle: bgmToggle, AudioElement } = useBgm(room?.category);
 
   // ── 1. Load room from API ──────────────────────────────────────
   useEffect(() => {
@@ -468,7 +470,7 @@ export default function GamePage() {
   return (
     <div className="h-screen flex flex-col overflow-hidden relative"
       style={{ background: "#0a0612" }}>
-      <BackgroundMusic category={room?.category} />
+      {AudioElement}
 
       {/* Background corresponding to Category */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
@@ -582,7 +584,24 @@ export default function GamePage() {
           </div>
 
           {/* Round + timer */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Music toggle — inline, to the left of Round text */}
+            {AudioElement && (
+              <button
+                onClick={bgmToggle}
+                className="btn-bounce w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                style={{
+                  background: "var(--pastel-purple)",
+                  border: "1.5px solid #c8a8ff",
+                  color: "var(--ink)",
+                  boxShadow: "var(--shadow-soft)",
+                  flexShrink: 0,
+                }}
+                title={bgmPlaying ? "Pause music" : "Play music"}
+              >
+                {bgmPlaying ? "🔊" : "🔇"}
+              </button>
+            )}
             <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.6)" }}>
               Round {round}/{totalRounds}
             </span>
