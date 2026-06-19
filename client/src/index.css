@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import "tailwindcss";
+
+/* ── Pastel Playful Design System ── */
+:root {
+  --pastel-pink:    #FFD6E7;
+  --pastel-purple:  #E8D5FF;
+  --pastel-blue:    #C8E6FF;
+  --pastel-mint:    #C8F5E8;
+  --pastel-yellow:  #FFF3C8;
+  --pastel-peach:   #FFE0CC;
+  --pastel-coral:   #FFBCBC;
+
+  --ink:            #2D2438;
+  --ink-soft:       #5A4F6B;
+  --surface:        #FDFAFF;
+  --white:          #FFFFFF;
+
+  --font-display: 'Pixelify Sans', sans-serif;
+--font-body: 'Pixelify Sans', sans-serif;
+  --shadow-soft: 0 4px 24px rgba(120,80,200,0.10);
+  --shadow-card: 0 8px 32px rgba(120,80,200,0.14);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: #0a0612;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 18px;
+  background: #0a0612;
+  color: rgba(240, 224, 255, 0.95);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  background: #0a0612;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--pastel-purple); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #c8a8ff; border-radius: 3px; }
+
+/* ── Utility classes ── */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+.font-body    { font-family: var(--font-body); }
+
+/* Playful bouncy button */
+.btn-bounce {
+  transition: transform 0.15s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease;
+}
+.btn-bounce:hover  { transform: translateY(-2px) scale(1.03); }
+.btn-bounce:active { transform: scale(0.97); }
+
+/* Wobbly card */
+.card-wobble {
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease;
+}
+.card-wobble:hover {
+  transform: rotate(-1deg) translateY(-3px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+.float { animation: float 3s ease-in-out infinite; }
+.float-slow { animation: float 4.5s ease-in-out infinite; }
+.float-fast { animation: float 2s ease-in-out infinite; }
+
+/* Pop in animation */
+@keyframes pop-in {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.pop-in { animation: pop-in 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* Slide up */
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.slide-up { animation: slide-up 0.3s ease forwards; }
+
+
+/* Correct guess flash */
+@keyframes correct-flash {
+  0%, 100% { background: transparent; }
+  50%       { background: rgba(100,220,150,0.3); }
+}
+.correct-flash { animation: correct-flash 0.6s ease; }
+
+/* Canvas cursor */
+.canvas-draw { cursor: crosshair; }
+
+/* Decorative blobs (background) */
+.blob {
+  border-radius: 50% 40% 60% 30% / 40% 60% 30% 50%;
+  position: absolute;
+  opacity: 0.35;
+  filter: blur(2px);
+}
+
+/* Spinning vinyl record (album cover reveal) */
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.vinyl-spin { animation: vinyl-spin 4s linear infinite; }
+
+/* Fullscreen overlay fade-in */
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.overlay-fade-in { animation: overlay-fade-in 0.35s ease forwards; }
+
+/* ── Global Layout Container ── */
+.page-container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Glassmorphism Panel ── */
+.glass-panel {
+  background: rgba(10, 6, 18, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 40px rgba(255, 255, 255, 0.15), 0 4px 40px rgba(0, 0, 0, 0.5);
+}
