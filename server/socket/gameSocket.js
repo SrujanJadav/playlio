@@ -219,12 +219,13 @@ const WORD_BANKS = {
 const activeGames = {};
 
 const ROUND_DURATION = 80; // seconds per drawing round
-const QUIZ_ROUND_DURATION = 20; // seconds per kids quiz image
-const MUSIC_ROUND_DURATION = 15; // seconds to pick an answer
+const QUIZ_ROUND_DURATION = 25; // seconds per kids quiz image (current 20 + 5)
+const MUSIC_ROUND_DURATION = 25; // seconds to pick an answer (current 15 + 10)
 const MUSIC_REVEAL_DURATION = 10; // seconds for album art + audio reveal
 const COUPLES_ANSWER_DURATION = 20; // seconds for the "answerer" to pick
 const COUPLES_GUESS_DURATION = 20; // seconds for the "guesser" to pick
 const COUPLES_REVEAL_DURATION = 6; // seconds to show the comparison
+
 
 module.exports = (io) => {
   io.on("connection", (socket) => {
