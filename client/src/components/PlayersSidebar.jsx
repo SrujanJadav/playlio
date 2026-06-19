@@ -9,9 +9,9 @@ export default function PlayersSidebar({ players, currentDrawerId, scores }) {
     <div className="rounded-2xl overflow-hidden glass-panel h-full flex flex-col"
       style={{
         border:"1.5px solid rgba(255, 255, 255, 0.35)",
-        background: "rgba(10, 6, 18, 0.82)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "rgba(255, 255, 255, 0.12)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
       }}>
       
       <div className="px-4 py-3 font-display text-base"
