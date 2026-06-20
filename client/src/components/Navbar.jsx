@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import GooeyNav from "./GooeyNav";
 import toast from "react-hot-toast";
+import PixelEmoji from "./PixelEmoji";
 
 const TITLE_LETTERS = [
   { ch: "P", color: "#ff99cc" },
@@ -41,9 +42,9 @@ export default function Navbar() {
   const currentIndex = ROUTE_TO_INDEX[location.pathname] ?? 0;
 
   const navItems = [
-    { label: "🏠 Lobby",   onClick: () => navigate("/lobby") },
-    { label: "🏆 Ranks",   onClick: () => navigate("/leaderboard") },
-    { label: "👤 Profile", onClick: () => navigate("/profile") },
+    { label: <span><PixelEmoji>🏠</PixelEmoji> Lobby</span>,   onClick: () => navigate("/lobby") },
+    { label: <span><PixelEmoji>🏆</PixelEmoji> Ranks</span>,   onClick: () => navigate("/leaderboard") },
+    { label: <span><PixelEmoji>👤</PixelEmoji> Profile</span>, onClick: () => navigate("/profile") },
   ];
 
   return (
@@ -133,7 +134,7 @@ export default function Navbar() {
               className="sm:hidden font-body text-xs px-2 py-1 rounded"
               style={{ background: "rgba(255,99,99,0.12)", color: "#ff9999", border: "1px solid rgba(255,99,99,0.3)" }}
             >
-              👋 Out
+              <PixelEmoji>👋</PixelEmoji> Out
             </button>
           </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import LiquidGlassTabs from "../components/LiquidGlassTabs";
+import PixelEmoji from "../components/PixelEmoji";
 
 export default function LeaderboardPage() {
   const { user } = useAuth();
@@ -34,7 +35,7 @@ export default function LeaderboardPage() {
         <div className="w-full max-w-[1000px] flex flex-col gap-8">
           
           <div className="text-center mb-4 flex flex-col items-center">
-            <div className="text-6xl float mb-3" style={{ filter: "drop-shadow(0 0 10px rgba(240,200,64,0.4))" }}>🏆</div>
+            <div className="text-6xl float mb-3" style={{ filter: "drop-shadow(0 0 10px rgba(240,200,64,0.4))" }}><PixelEmoji>🏆</PixelEmoji></div>
             <h1 className="font-display text-3xl text-glow-soft" style={{ color:"#f0e0ff", lineHeight: 1.6 }}>Leaderboard</h1>
             <p className="font-body text-base mt-2" style={{ color:"rgba(240,224,255,0.6)" }}>
               Who's drawing their way to the top?
@@ -47,20 +48,20 @@ export default function LeaderboardPage() {
               activeTab={tab}
               onChange={setTab}
               tabs={[
-                { id: "global",  label: "🌍 Global" },
-                { id: "friends", label: "👯 Friends" },
+                { id: "global",  label: <span><PixelEmoji>🌍</PixelEmoji> Global</span> },
+                { id: "friends", label: <span><PixelEmoji>👯</PixelEmoji> Friends</span> },
               ]}
             />
           </div>
 
           {loading ? (
             <div className="text-center py-20 font-display text-xl animate-pulse" style={{ color:"rgba(240,224,255,0.6)" }}>
-              <span className="float inline-block">🎨</span> Loading Leaderboard…
+              <span className="float inline-block"><PixelEmoji>🎨</PixelEmoji></span> Loading Leaderboard…
             </div>
           ) : data.length === 0 ? (
             <div className="text-center py-16 rounded-3xl glass-panel w-full"
               style={{ borderStyle: "dashed" }}>
-              <div className="text-6xl mb-4 float">🏜️</div>
+              <div className="text-6xl mb-4 float"><PixelEmoji>🏜️</PixelEmoji></div>
               <p className="font-display text-xl" style={{ color:"#f0e0ff" }}>
                 {tab === "friends" ? "No friends yet!" : "No players yet!"}
               </p>
@@ -110,7 +111,7 @@ export default function LeaderboardPage() {
                     }}>
                     
                     <span className="font-display text-2xl w-8 text-center flex-shrink-0" style={{ color: titleColor }}>
-                      {medals[i] ?? `${i + 1}`}
+                      {medals[i] ? <PixelEmoji>{medals[i]}</PixelEmoji> : i + 1}
                     </span>
 
                     <img
@@ -123,7 +124,7 @@ export default function LeaderboardPage() {
                         {player.username} {isMe && <span className="font-semibold text-glow-soft" style={{ color: "#84c8ff" }}>(You)</span>}
                       </p>
                       <p className="font-body text-xs" style={{ color: "rgba(240,224,255,0.45)" }}>
-                        🎮 {player.gamesPlayed} games played
+                        <PixelEmoji>🎮</PixelEmoji> {player.gamesPlayed} games played
                       </p>
                     </div>
 
@@ -131,7 +132,9 @@ export default function LeaderboardPage() {
                     <div className="flex gap-1.5 flex-shrink-0">
                       {player.badges?.slice(0, 3).map(b => (
                         <span key={b} className="text-lg" title={b}>
-                          {{first_win:"🏆",streak_3:"🔥",points_500:"⭐",points_1000:"💎",social_butterfly:"🦋"}[b]}
+                          <PixelEmoji>
+                            {{first_win:"🏆",streak_3:"🔥",points_500:"⭐",points_1000:"💎",social_butterfly:"🦋"}[b]}
+                          </PixelEmoji>
                         </span>
                       ))}
                     </div>

@@ -82,7 +82,13 @@ const GooeyNav = ({
     };
     Object.assign(filterRef.current.style, styles);
     Object.assign(textRef.current.style, styles);
-    textRef.current.innerText = element.innerText;
+    
+    const linkEl = element.querySelector('a');
+    if (linkEl) {
+      textRef.current.innerHTML = linkEl.innerHTML;
+    } else {
+      textRef.current.innerText = element.innerText;
+    }
   };
 
   const handleClick = (e, index) => {

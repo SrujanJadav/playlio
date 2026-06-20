@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import PixelEmoji from "../components/PixelEmoji";
 
 const BADGE_META = {
   first_win:        { icon:"🏆", label:"First Win",         desc:"Won your first game!" },
@@ -74,7 +75,7 @@ export default function ProfilePage() {
                 src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`}
                 className="w-24 h-24 rounded-full float relative z-10"
                 style={{ border:"3px solid #c8a8ff" }} />
-              <div className="absolute bottom-1 right-1 text-xl z-20">🎨</div>
+              <div className="absolute bottom-1 right-1 text-xl z-20"><PixelEmoji>🎨</PixelEmoji></div>
             </div>
             <h1 className="font-display text-3xl text-glow-soft" style={{ color: "#f0e0ff" }}>
               {user?.username}
@@ -100,7 +101,7 @@ export default function ProfilePage() {
                   WebkitBackdropFilter: "blur(24px)",
                   minHeight: "130px"
                 }}>
-                <div className="text-3xl mb-2" style={{ filter: `drop-shadow(0 0 8px ${s.border})` }}>{s.icon}</div>
+                <div className="text-3xl mb-2" style={{ filter: `drop-shadow(0 0 8px ${s.border})` }}><PixelEmoji>{s.icon}</PixelEmoji></div>
                 <div className="font-display text-2xl text-glow-soft" style={{ color: "#f0e0ff" }}>{s.value}</div>
                 <div className="font-body text-sm font-semibold tracking-wide" style={{ color: "rgba(240,224,255,0.5)" }}>{s.label}</div>
               </div>
@@ -110,7 +111,7 @@ export default function ProfilePage() {
           {/* BADGES SECTION */}
           <div className="p-8 rounded-3xl glass-panel w-full">
             <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color:"#c8a8ff" }}>
-              <span>🏅</span> Badges
+              <span><PixelEmoji>🏅</PixelEmoji></span> Badges
             </h2>
             <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
               {ALL_BADGES.map(b => {
@@ -128,7 +129,7 @@ export default function ProfilePage() {
                     }}
                     title={meta.desc}>
                     <span className="text-4xl" style={{ filter: earned ? "drop-shadow(0 0 6px rgba(240,200,64,0.5))" : "none" }}>
-                      {meta.icon}
+                      <PixelEmoji>{meta.icon}</PixelEmoji>
                     </span>
                     <span className="font-display text-xs" style={{ color: earned ? "#f0c840" : "rgba(240,224,255,0.6)" }}>
                       {meta.label}
@@ -147,7 +148,7 @@ export default function ProfilePage() {
             <div className="p-8 rounded-3xl glass-panel w-full"
               style={{ borderColor: "rgba(109,213,168,0.4)", boxShadow: "0 0 20px rgba(109,213,168,0.1)" }}>
               <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color:"#6dd5a8" }}>
-                <span>🔔</span> Friend Requests
+                <span><PixelEmoji>🔔</PixelEmoji></span> Friend Requests
               </h2>
               <div className="space-y-3">
                 {user.friendRequests.filter(r => r.status === "pending").map(r => (
@@ -170,7 +171,7 @@ export default function ProfilePage() {
           {/* FIND PLAYERS (SEARCH) SECTION */}
           <div className="p-8 rounded-3xl glass-panel w-full" style={{ borderColor: "rgba(132,200,255,0.3)" }}>
             <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color:"#84c8ff" }}>
-              <span>🔍</span> Find Players
+              <span><PixelEmoji>🔍</PixelEmoji></span> Find Players
             </h2>
             <div className="flex gap-3 mb-6">
               <input type="text" placeholder="Search by username…"
@@ -198,7 +199,7 @@ export default function ProfilePage() {
                     className="w-10 h-10 rounded-full" style={{ border:"2px solid #84c8ff" }} />
                   <div className="flex-1 min-w-0">
                     <p className="font-body font-bold text-sm text-[#f0e0ff] truncate">{u.username}</p>
-                    <p className="font-body text-xs text-[rgba(240,224,255,0.5)]">⭐ {u.totalPoints} pts</p>
+                    <p className="font-body text-xs text-[rgba(240,224,255,0.5)]"><PixelEmoji>⭐</PixelEmoji> {u.totalPoints} pts</p>
                   </div>
                   <button onClick={() => sendFriendRequest(u._id)}
                     className="btn-bounce px-4 py-2 rounded-xl font-body text-xs font-bold cursor-target"

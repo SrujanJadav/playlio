@@ -1,0 +1,6 @@
+.pixel-emoji {
+  display: inline-block;
+  filter: url(#pixelate-emoji-filter);
+  line-height: 1;
+  vertical-align: middle;
+}
