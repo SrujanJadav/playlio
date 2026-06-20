@@ -63,7 +63,7 @@ export default function Navbar() {
               className="font-display"
               style={{
                 color: l.color,
-                fontSize: i === 0 ? "52px" : "40px",
+                fontSize: i === 0 ? "72px" : "58px",
                 lineHeight: 1,
                 textShadow: `0 0 20px ${l.color}cc, 0 0 40px ${l.color}55`,
                 display: "inline-block",

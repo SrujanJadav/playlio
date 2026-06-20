@@ -338,6 +338,185 @@ export default function LobbyPage() {
           )}
 
         </div>
+
+        {/* ── ABOUT / NEWS / HOW TO PLAY ── */}
+        <div className="w-full mt-20 mb-4">
+          {/* Section header divider */}
+          <div className="flex items-center gap-4 mb-10">
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(200,168,255,0.25))" }} />
+            <span className="font-display text-xs tracking-[4px]" style={{ color: "rgba(200,168,255,0.4)", lineHeight: 1.6 }}>
+              ✦ DISCOVER PLAYLIO ✦
+            </span>
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(200,168,255,0.25))" }} />
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6 w-full">
+
+            {/* ── ABOUT ── */}
+            <div
+              className="rounded-3xl p-8 flex flex-col gap-5 transition-transform hover:scale-[1.02]"
+              style={{
+                background: "rgba(10,6,18,0.7)",
+                border: "1.5px solid rgba(132,200,255,0.2)",
+                backdropFilter: "blur(20px)",
+                boxShadow: "0 8px 40px rgba(132,200,255,0.06)",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">❓</span>
+                <h2 className="font-display text-sm" style={{ color: "#84c8ff", lineHeight: 1.6 }}>About</h2>
+              </div>
+              <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.65)" }}>
+                <span style={{ color: "#c8a8ff", fontWeight: 600 }}>Playlio</span> is a free online multiplayer party game platform where friends compete in fast-paced mini-games.
+              </p>
+              <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
+                Each round tests a different skill — drawing, guessing, music knowledge, or animal instincts. The player with the most points at the end wins!
+              </p>
+              <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
+                Invite your friends, pick a game mode, and let the fun begin. 🎉
+              </p>
+              {/* Game mode chips */}
+              <div className="flex flex-wrap gap-2 mt-auto pt-2">
+                {[
+                  { label: "🎨 Draw n Guess", color: "#6dd5a8" },
+                  { label: "🐾 Animal Quiz", color: "#84c8ff" },
+                  { label: "💕 Couples",      color: "#ff99cc" },
+                  { label: "🎵 Music Quiz",   color: "#c8a8ff" },
+                ].map(m => (
+                  <span
+                    key={m.label}
+                    className="font-body text-sm px-3 py-1 rounded-full"
+                    style={{ background: `${m.color}15`, color: m.color, border: `1px solid ${m.color}30` }}
+                  >
+                    {m.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* ── NEWS ── */}
+            <div
+              className="rounded-3xl p-8 flex flex-col gap-4 transition-transform hover:scale-[1.02]"
+              style={{
+                background: "rgba(10,6,18,0.7)",
+                border: "1.5px solid rgba(109,213,168,0.2)",
+                backdropFilter: "blur(20px)",
+                boxShadow: "0 8px 40px rgba(109,213,168,0.06)",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">📰</span>
+                <h2 className="font-display text-sm" style={{ color: "#6dd5a8", lineHeight: 1.6 }}>News</h2>
+              </div>
+
+              {/* News items */}
+              {[
+                {
+                  date: "June 2025",
+                  title: "🎉 Playlio is Live!",
+                  body: "We've launched with 4 amazing game modes — Draw n Guess, Animal Quiz, Couples, and Music Quiz. Invite your friends and start playing!",
+                  accent: "#6dd5a8",
+                },
+                {
+                  date: "Coming soon",
+                  title: "🎮 More Games",
+                  body: "New game modes are being crafted. Stay tuned for exciting additions to the Playlio universe!",
+                  accent: "#c8a8ff",
+                },
+                {
+                  date: "Coming soon",
+                  title: "📱 Mobile Support",
+                  body: "A fully responsive mobile experience is on the roadmap. Play on any device, anywhere.",
+                  accent: "#84c8ff",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl p-4 flex flex-col gap-1"
+                  style={{ background: `${item.accent}08`, border: `1px solid ${item.accent}20` }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display text-xs" style={{ color: item.accent, lineHeight: 1.6 }}>{item.title}</span>
+                    <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.3)" }}>{item.date}</span>
+                  </div>
+                  <p className="font-body text-sm" style={{ color: "rgba(240,224,255,0.5)", lineHeight: 1.6 }}>
+                    {item.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* ── HOW TO PLAY (placeholder) ── */}
+            <div
+              className="rounded-3xl p-8 flex flex-col gap-5 transition-transform hover:scale-[1.02] relative overflow-hidden"
+              style={{
+                background: "rgba(10,6,18,0.7)",
+                border: "1.5px solid rgba(200,168,255,0.2)",
+                backdropFilter: "blur(20px)",
+                boxShadow: "0 8px 40px rgba(200,168,255,0.06)",
+              }}
+            >
+              {/* Coming soon badge */}
+              <div
+                className="absolute top-4 right-4 font-display text-xs px-3 py-1 rounded-full"
+                style={{
+                  background: "rgba(200,168,255,0.12)",
+                  color: "#c8a8ff",
+                  border: "1px solid rgba(200,168,255,0.3)",
+                  lineHeight: 1.6,
+                  fontSize: "9px",
+                  letterSpacing: "2px",
+                }}
+              >
+                COMING SOON
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">🎓</span>
+                <h2 className="font-display text-sm" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>How to Play</h2>
+              </div>
+
+              {/* Placeholder steps */}
+              <div className="flex flex-col gap-3 mt-2">
+                {[
+                  { step: "01", label: "Pick a Game Mode", icon: "🎮" },
+                  { step: "02", label: "Create or Join a Room", icon: "🚪" },
+                  { step: "03", label: "Invite Your Friends", icon: "👥" },
+                  { step: "04", label: "Compete & Win Points", icon: "🏆" },
+                ].map(s => (
+                  <div
+                    key={s.step}
+                    className="flex items-center gap-4 rounded-xl px-4 py-3"
+                    style={{ background: "rgba(200,168,255,0.05)", border: "1px solid rgba(200,168,255,0.12)" }}
+                  >
+                    <span className="font-display text-xs" style={{ color: "rgba(200,168,255,0.35)", lineHeight: 1.6, minWidth: "20px" }}>{s.step}</span>
+                    <span className="text-xl">{s.icon}</span>
+                    <span className="font-body text-base" style={{ color: "rgba(240,224,255,0.4)" }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Blurred overlay to show "coming soon" feel */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-24 flex items-end justify-center pb-6"
+                style={{ background: "linear-gradient(to bottom, transparent, rgba(10,6,18,0.85))" }}
+              >
+                <p className="font-display text-xs" style={{ color: "rgba(200,168,255,0.4)", lineHeight: 1.6, letterSpacing: "2px" }}>
+                  Full guide dropping soon ✨
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-center gap-6 mt-12 mb-4">
+            <span className="font-body text-sm" style={{ color: "rgba(200,168,255,0.25)" }}>
+              © 2025 Playlio · Made with 💜 for gamers everywhere
+            </span>
+          </div>
+        </div>
+
       </div>
   );
 }
