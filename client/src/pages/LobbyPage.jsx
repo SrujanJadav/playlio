@@ -5,6 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import LiquidGlassTabs from "../components/LiquidGlassTabs";
 import PixelButton from "../components/PixelButton";
+import BounceCards from "../components/BounceCards";
 
 const CATEGORIES = [
   { id:"general", label:"🎨 Draw n Guess", desc:"Classic drawing game",   bg:"linear-gradient(135deg,#1a4d1a,#2d7a2d)", border:"#6dd5a8" },
@@ -446,9 +447,9 @@ export default function LobbyPage() {
               ))}
             </div>
 
-            {/* ── HOW TO PLAY (placeholder) ── */}
+            {/* ── BEFORE YOU START (BounceCards component) ── */}
             <div
-              className="rounded-3xl p-8 flex flex-col gap-5 transition-transform hover:scale-[1.02] relative overflow-hidden"
+              className="rounded-3xl p-8 flex flex-col justify-between transition-transform hover:scale-[1.02] relative overflow-hidden min-h-[460px]"
               style={{
                 background: "rgba(10,6,18,0.7)",
                 border: "1.5px solid rgba(200,168,255,0.2)",
@@ -456,53 +457,44 @@ export default function LobbyPage() {
                 boxShadow: "0 8px 40px rgba(200,168,255,0.06)",
               }}
             >
-              {/* Coming soon badge */}
-              <div
-                className="absolute top-4 right-4 font-display text-xs px-3 py-1 rounded-full"
-                style={{
-                  background: "rgba(200,168,255,0.12)",
-                  color: "#c8a8ff",
-                  border: "1px solid rgba(200,168,255,0.3)",
-                  lineHeight: 1.6,
-                  fontSize: "9px",
-                  letterSpacing: "2px",
-                }}
-              >
-                COMING SOON
-              </div>
-
               <div className="flex items-center gap-3">
-                <span className="text-3xl">🎓</span>
-                <h2 className="font-display text-sm" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>How to Play</h2>
+                <span className="text-3xl">🏁</span>
+                <h2 className="font-display text-sm" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>Before You Start</h2>
               </div>
 
-              {/* Placeholder steps */}
-              <div className="flex flex-col gap-3 mt-2">
-                {[
-                  { step: "01", label: "Pick a Game Mode", icon: "🎮" },
-                  { step: "02", label: "Create or Join a Room", icon: "🚪" },
-                  { step: "03", label: "Invite Your Friends", icon: "👥" },
-                  { step: "04", label: "Compete & Win Points", icon: "🏆" },
-                ].map(s => (
-                  <div
-                    key={s.step}
-                    className="flex items-center gap-4 rounded-xl px-4 py-3"
-                    style={{ background: "rgba(200,168,255,0.05)", border: "1px solid rgba(200,168,255,0.12)" }}
-                  >
-                    <span className="font-display text-xs" style={{ color: "rgba(200,168,255,0.35)", lineHeight: 1.6, minWidth: "20px" }}>{s.step}</span>
-                    <span className="text-xl">{s.icon}</span>
-                    <span className="font-body text-base" style={{ color: "rgba(240,224,255,0.4)" }}>{s.label}</span>
-                  </div>
-                ))}
+              {/* BounceCards Component */}
+              <div className="flex-1 flex items-center justify-center my-6">
+                <BounceCards
+                  images={[
+                    "/images/card1.png",
+                    "/images/card2.png",
+                    "/images/card3.png",
+                    "/images/card4.png"
+                  ]}
+                  captions={[
+                    "1. Draw & Guess",
+                    "2. Animal Quiz",
+                    "3. Music Quiz",
+                    "4. Couples Mode"
+                  ]}
+                  containerWidth={360}
+                  containerHeight={280}
+                  animationDelay={0.4}
+                  animationStagger={0.08}
+                  easeType="elastic.out(1, 0.75)"
+                  transformStyles={[
+                    "rotate(-8deg) translate(-100px, -6px)",
+                    "rotate(-3deg) translate(-33px, 4px)",
+                    "rotate(3deg) translate(33px, 4px)",
+                    "rotate(8deg) translate(100px, -6px)"
+                  ]}
+                  enableHover={true}
+                />
               </div>
 
-              {/* Blurred overlay to show "coming soon" feel */}
-              <div
-                className="absolute inset-x-0 bottom-0 h-24 flex items-end justify-center pb-6"
-                style={{ background: "linear-gradient(to bottom, transparent, rgba(10,6,18,0.85))" }}
-              >
-                <p className="font-display text-xs" style={{ color: "rgba(200,168,255,0.4)", lineHeight: 1.6, letterSpacing: "2px" }}>
-                  Full guide dropping soon ✨
+              <div className="text-center w-full mt-2">
+                <p className="font-body text-base" style={{ color: "rgba(200,168,255,0.45)" }}>
+                  Hover over the cards to explore the steps!
                 </p>
               </div>
             </div>

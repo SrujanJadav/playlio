@@ -1,0 +1,58 @@
+.bounceCardsContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  position: absolute;
+  width: 190px;
+  background: #fbf9f5; /* Polaroid off-white/cream */
+  padding: 10px 10px 34px 10px; /* Thicker bottom padding for Polaroid frame */
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s ease;
+  user-select: none;
+}
+
+/* Add a slight vintage highlight to the card border */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+.card:hover {
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(200, 168, 255, 0.3);
+  z-index: 100 !important;
+}
+
+.card .image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #151020;
+  /* Retro crisp pixels rendering */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.card .caption {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: #1a0f2b; /* dark ink tone */
+  text-align: center;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.85;
+}

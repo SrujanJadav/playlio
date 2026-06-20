@@ -20,6 +20,41 @@ const setTokenCookie = (res, token) => {
   });
 };
 
+const User = require("../models/User");
+
+// ─── DEV LOGIN BYPASS ──────────────────────────────────────────
+router.get("/dev-login", async (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).send("Forbidden in production");
+  }
+  try {
+    let user = await User.findOne({ email: "dev@playlio.local" });
+    if (!user) {
+      user = await User.create({
+        username: "Developer",
+        email: "dev@playlio.local",
+        avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Developer",
+        totalPoints: 1250,
+        gamesPlayed: 14,
+        badges: ["first_win", "streak_3", "points_500", "points_1000"],
+      });
+    }
+    const token = generateToken(user._id);
+    setTokenCookie(res, token);
+    
+    // Dynamically redirect based on where the request came from
+    let redirectUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    if (req.headers.referer) {
+      try {
+        redirectUrl = new URL(req.headers.referer).origin;
+      } catch {}
+    }
+    res.redirect(`${redirectUrl}/lobby`);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── GOOGLE OAUTH ────────────────────────────────────────────────
 
 // Step 1: Redirect user to Google login page
