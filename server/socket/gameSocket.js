@@ -2,24 +2,51 @@ const Room = require("../models/Room");
 const User = require("../models/User");
 
 // Image + answer pairs for Kids mode (visual recognition quiz)
-const KIDS_QUIZ_BANK = [
-  { image: "/kids-quiz/Cat-head.jpg", answer: "cat" },
-  { image: "/kids-quiz/Chicken-head.jpg", answer: "chicken" },
-  { image: "/kids-quiz/cow-head.jpg", answer: "cow" },
-  { image: "/kids-quiz/crocodile-legs.jpg", answer: "crocodile" },
-  { image: "/kids-quiz/Dog-head.jpg", answer: "dog" },
-  { image: "/kids-quiz/donkey-head.jpg", answer: "donkey" },
-  { image: "/kids-quiz/giraffe-head.jpg", answer: "giraffe" },
-  { image: "/kids-quiz/giraffe-legs.jpg", answer: "giraffe" },
-  { image: "/kids-quiz/horse-head.jpg", answer: "horse" },
-  { image: "/kids-quiz/Lamma-head.jpg", answer: "llama" },
-  { image: "/kids-quiz/Ostrich-head.jpg", answer: "ostrich" },
-  { image: "/kids-quiz/peacock-head.jpg", answer: "peacock" },
-  { image: "/kids-quiz/racoon-head.jpg", answer: "raccoon" },
-  { image: "/kids-quiz/snake-head.jpg", answer: "snake" },
-  { image: "/kids-quiz/turtle-head.jpg", answer: "turtle" },
-  { image: "/kids-quiz/zebra-legs.jpg", answer: "zebra" },
-];
+const KIDS_QUIZ_BANK = {
+  common: [
+    { image: "/kids-quiz/Cat-head.jpg", answer: "cat" },
+    { image: "/kids-quiz/Dog-head.jpg", answer: "dog" },
+    { image: "/kids-quiz/horse-head.jpg", answer: "horse" },
+    { image: "/kids-quiz/cow-head.jpg", answer: "cow" },
+    { image: "/kids-quiz/Chicken-head.jpg", answer: "chicken" },
+    { image: "/kids-quiz/donkey-head.jpg", answer: "donkey" },
+    { image: "/kids-quiz/giraffe-head.jpg", answer: "giraffe" },
+  ],
+  mixed: [
+    { image: "/kids-quiz/Cat-head.jpg", answer: "cat" },
+    { image: "/kids-quiz/Dog-head.jpg", answer: "dog" },
+    { image: "/kids-quiz/horse-head.jpg", answer: "horse" },
+    { image: "/kids-quiz/cow-head.jpg", answer: "cow" },
+    { image: "/kids-quiz/Chicken-head.jpg", answer: "chicken" },
+    { image: "/kids-quiz/donkey-head.jpg", answer: "donkey" },
+    { image: "/kids-quiz/giraffe-head.jpg", answer: "giraffe" },
+    { image: "/kids-quiz/Lamma-head.jpg", answer: "llama" },
+    { image: "/kids-quiz/Ostrich-head.jpg", answer: "ostrich" },
+    { image: "/kids-quiz/peacock-head.jpg", answer: "peacock" },
+    { image: "/kids-quiz/racoon-head.jpg", answer: "raccoon" },
+    { image: "/kids-quiz/snake-head.jpg", answer: "snake" },
+    { image: "/kids-quiz/turtle-head.jpg", answer: "turtle" },
+    { image: "/kids-quiz/Koala.jpg", answer: "koala" },
+    { image: "/kids-quiz/kangaroo.jpg", answer: "kangaroo" },
+    { image: "/kids-quiz/panda.jpg", answer: "panda" },
+    { image: "/kids-quiz/penguin.jpg", answer: "penguin" },
+    { image: "/kids-quiz/seal.jpg", answer: "seal" },
+  ],
+  expert: [
+    { image: "/kids-quiz/crocodile-legs.jpg", answer: "crocodile" },
+    { image: "/kids-quiz/zebra-legs.jpg", answer: "zebra" },
+    { image: "/kids-quiz/giraffe-legs.jpg", answer: "giraffe" },
+    { image: "/kids-quiz/Clownfish.jpg", answer: "clownfish" },
+    { image: "/kids-quiz/axolotl.jpg", answer: "axolotl" },
+    { image: "/kids-quiz/chameleon.jpg", answer: "chameleon" },
+    { image: "/kids-quiz/cheetah.jpg", answer: "cheetah" },
+    { image: "/kids-quiz/meerkat.jpg", answer: "meerkat" },
+    { image: "/kids-quiz/okapi.jpg", answer: "okapi" },
+    { image: "/kids-quiz/platypus.jpg", answer: "platypus" },
+    { image: "/kids-quiz/porcupine.jpg", answer: "porcupine" },
+    { image: "/kids-quiz/red-panda.jpg", answer: "red panda" },
+  ]
+};
 
 // Lyric-snippet + multiple-choice pairs for Music Quiz mode
 const MUSIC_BANK = [
@@ -339,6 +366,8 @@ module.exports = (io) => {
           roundDuration: room.roundDuration || 80,
           wordDifficulty: room.wordDifficulty || "mixed",
           enableHints: room.enableHints !== undefined ? room.enableHints : true,
+          quizAnswerTime: room.quizAnswerTime || 20,
+          quizDifficulty: room.quizDifficulty || "mixed",
           scores: {},
           guessedThisRound: new Set(),
           category: room.category,
@@ -670,15 +699,21 @@ module.exports = (io) => {
     // Reset guesses for new round
     game.guessedThisRound = new Set();
 
+    // Select correct animal bank depending on difficulty setting
+    const difficulty = game.quizDifficulty || "mixed";
+    const bank = KIDS_QUIZ_BANK[difficulty] || KIDS_QUIZ_BANK.mixed;
+
+    const duration = game.quizAnswerTime || 20;
+
     // Pick a random image+answer, avoid repeating the same item back-to-back
     let item;
     do {
-      item = KIDS_QUIZ_BANK[Math.floor(Math.random() * KIDS_QUIZ_BANK.length)];
-    } while (KIDS_QUIZ_BANK.length > 1 && item.answer === game.currentWord);
+      item = bank[Math.floor(Math.random() * bank.length)];
+    } while (bank.length > 1 && item.answer === game.currentWord);
 
     game.currentWord = item.answer;
     game.currentImage = item.image;
-    game.roundEndTime = Date.now() + QUIZ_ROUND_DURATION * 1000;
+    game.roundEndTime = Date.now() + duration * 1000;
     game.guessRank = 0; // tracks how many players have guessed correctly this round (for tiered points)
 
     // Update room in DB
@@ -691,11 +726,11 @@ module.exports = (io) => {
       image: item.image,
       round: game.round,
       totalRounds: game.totalRounds,
-      duration: QUIZ_ROUND_DURATION,
+      duration: duration,
     });
 
     // Set round timer
-    game.timer = setTimeout(() => endQuizRound(io, roomCode), QUIZ_ROUND_DURATION * 1000);
+    game.timer = setTimeout(() => endQuizRound(io, roomCode), duration * 1000);
   }
 
   function handleQuizGuess(io, roomCode, game, { userId, username, message }) {

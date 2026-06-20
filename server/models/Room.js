@@ -81,6 +81,15 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    quizAnswerTime: {
+      type: Number,
+      default: 20,
+    },
+    quizDifficulty: {
+      type: String,
+      enum: ["common", "mixed", "expert"],
+      default: "mixed",
+    },
   },
   { timestamps: true }
 );

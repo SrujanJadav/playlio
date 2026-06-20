@@ -101,6 +101,8 @@ export default function LobbyPage() {
   const [roundDuration, setRoundDuration]   = useState(80);
   const [wordDifficulty, setWordDifficulty] = useState("mixed");
   const [enableHints, setEnableHints]       = useState(true);
+  const [quizAnswerTime, setQuizAnswerTime] = useState(20);
+  const [quizDifficulty, setQuizDifficulty] = useState("mixed");
   const [joinCode, setJoinCode]     = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
   const [loading, setLoading]   = useState(false);
@@ -122,6 +124,7 @@ export default function LobbyPage() {
     try {
       const isCouples = category === "couples";
       const isDraw = category === "general";
+      const isKids = category === "kids";
       const { data } = await axios.post("/api/room/create", {
         category,
         maxPlayers: isCouples ? 2 : maxPlayers,
@@ -131,6 +134,8 @@ export default function LobbyPage() {
         roundDuration: isDraw ? roundDuration : 80,
         wordDifficulty: isDraw ? wordDifficulty : "mixed",
         enableHints: isDraw ? enableHints : true,
+        quizAnswerTime: isKids ? quizAnswerTime : 20,
+        quizDifficulty: isKids ? quizDifficulty : "mixed",
       });
       toast.success(`Room ${data.code} created! 🎉`);
       navigate(`/game/${data.code}`);
@@ -355,6 +360,76 @@ export default function LobbyPage() {
                       </div>
                     )}
 
+                    {/* SECTION 1.6: ANIMAL QUIZ CONFIG (only when kids mode is selected) */}
+                    {category === "kids" && (
+                      <div className="mb-6">
+                        <div className="font-display text-xs tracking-wider mb-3 pb-1 border-b border-white/10" style={{ color: "rgba(132,200,255,0.8)" }}>
+                          ANIMAL QUIZ OPTIONS
+                        </div>
+                        
+                        {/* Answer Time */}
+                        <div className="flex flex-col py-3 border-b border-white/5">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-body text-base text-white/80">Answer Time</span>
+                            <span className="font-display text-xs" style={{ color: "#84c8ff" }}>{quizAnswerTime}s</span>
+                          </div>
+                          <div className="flex gap-2">
+                            {[10, 15, 20, 30].map(t => (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => setQuizAnswerTime(t)}
+                                className="flex-1 py-2 rounded-lg font-body text-sm border transition-all duration-200 cursor-pointer"
+                                style={{
+                                  background: quizAnswerTime === t ? "rgba(132,200,255,0.12)" : "rgba(255,255,255,0.03)",
+                                  borderColor: quizAnswerTime === t ? "#84c8ff" : "rgba(255,255,255,0.12)",
+                                  color: quizAnswerTime === t ? "#84c8ff" : "rgba(255,255,255,0.6)",
+                                  boxShadow: quizAnswerTime === t ? "0 0 16px rgba(132,200,255,0.3)" : "none",
+                                  fontWeight: quizAnswerTime === t ? "bold" : "normal"
+                                }}
+                              >
+                                {t}s
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Difficulty */}
+                        <div className="flex flex-col py-3">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-body text-base text-white/80">Difficulty</span>
+                            <span className="font-display text-xs capitalize" style={{ color: "#84c8ff" }}>
+                              {quizDifficulty === "common" ? "Common" : quizDifficulty === "expert" ? "Expert" : "Mixed"}
+                            </span>
+                          </div>
+                          <div className="flex rounded-lg overflow-hidden bg-black/30 border border-white/10 p-0.5 w-full font-body text-xs mb-2">
+                            {["common", "mixed", "expert"].map(diff => (
+                              <button
+                                key={diff}
+                                type="button"
+                                onClick={() => setQuizDifficulty(diff)}
+                                className="flex-1 py-2 text-center rounded transition-all duration-200 cursor-pointer capitalize"
+                                style={{
+                                  background: quizDifficulty === diff ? "rgba(132,200,255,0.15)" : "transparent",
+                                  color: quizDifficulty === diff ? "#84c8ff" : "rgba(255,255,255,0.6)",
+                                  fontWeight: quizDifficulty === diff ? "bold" : "normal"
+                                }}
+                              >
+                                {diff === "common" ? "Common" : diff === "expert" ? "Expert" : "Mixed"}
+                              </button>
+                            ))}
+                          </div>
+                          
+                          {/* Segment Description */}
+                          <div className="font-body text-xs text-white/40 leading-relaxed bg-black/10 p-2.5 rounded border border-white/5">
+                            {quizDifficulty === "common" && "🐾 Common: Dog, Cat, Horse, Lion, Cow, Chicken..."}
+                            {quizDifficulty === "mixed" && "🦁 Mixed: Common + uncommon animals"}
+                            {quizDifficulty === "expert" && "🦄 Expert: Look-alikes and rare species"}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* SECTION 2: DYNAMIC CATEGORY-SPECIFIC DETAILS */}
                     <div className="mt-4 rounded-2xl p-5 border" style={{
                       background: category === "general" ? "rgba(109,213,168,0.04)" : 
@@ -397,9 +472,9 @@ export default function LobbyPage() {
                         )}
                         {category === "kids" && (
                           <>
-                            <li>• <span className="text-white/70">25 seconds</span> per animal.</li>
+                            <li>• <span className="text-white/70">{quizAnswerTime} seconds</span> per animal to identify the image.</li>
+                            <li>• Difficulty set to <span className="text-[#84c8ff] capitalize">{quizDifficulty}</span> animals.</li>
                             <li>• Images start zoomed/pixelated and reveal slowly.</li>
-                            <li>• Open chat guess box — type as fast as you can!</li>
                           </>
                         )}
                         {category === "music" && (
