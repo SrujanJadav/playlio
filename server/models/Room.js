@@ -64,6 +64,10 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    autoStartWhenFull: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

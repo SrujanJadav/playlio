@@ -280,26 +280,35 @@ module.exports = (io) => {
 
         // Broadcast updated player list to ALL in room
         io.to(roomCode).emit("players_updated", { players: room.players });
+
+        // Auto start when full check
+        if (room.autoStartWhenFull && room.players.length >= room.maxPlayers) {
+          setTimeout(async () => {
+            // Re-fetch room to ensure players are still here
+            const r = await Room.findOne({ code: roomCode });
+            if (r && r.status === "waiting" && r.players.length >= r.maxPlayers) {
+              await startGameHelper(io, roomCode);
+            }
+          }, 1500);
+        }
       } catch (err) {
         console.error("join_room error:", err);
         socket.emit("error", { message: "Failed to join room" });
       }
     });
 
-    // ─── START GAME ──────────────────────────────────────────────
-    socket.on("start_game", async ({ roomCode }) => {
+    // Helper: start game logic
+    async function startGameHelper(io, roomCode) {
       try {
         const room = await Room.findOne({ code: roomCode });
-        if (!room) return;
+        if (!room) return { error: "Room not found" };
 
         if (room.category === "couples") {
           if (room.players.length !== 2) {
-            socket.emit("error", { message: "Couples mode needs exactly 2 players! 💕" });
-            return;
+            return { error: "Couples mode needs exactly 2 players! 💕" };
           }
         } else if (room.players.length < 2) {
-          socket.emit("error", { message: "Need at least 2 players to start!" });
-          return;
+          return { error: "Need at least 2 players to start!" };
         }
 
         room.status = "playing";
@@ -340,8 +349,18 @@ module.exports = (io) => {
         } else {
           setTimeout(() => startNewRound(io, roomCode), 2000);
         }
+        return { success: true };
       } catch (err) {
-        console.error("start_game error:", err);
+        console.error("startGameHelper error:", err);
+        return { error: "Internal server error" };
+      }
+    }
+
+    // ─── START GAME ──────────────────────────────────────────────
+    socket.on("start_game", async ({ roomCode }) => {
+      const res = await startGameHelper(io, roomCode);
+      if (res && res.error) {
+        socket.emit("error", { message: res.error });
       }
     });
 

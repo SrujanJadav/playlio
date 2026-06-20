@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import LiquidGlassTabs from "../components/LiquidGlassTabs";
 import PixelButton from "../components/PixelButton";
 import BounceCards from "../components/BounceCards";
+import Counter from "../components/Counter";
 
 const CATEGORIES = [
   { id:"general", label:"🎨 Draw n Guess", desc:"Classic drawing game",   bg:"linear-gradient(135deg,#1a4d1a,#2d7a2d)", border:"#6dd5a8" },
@@ -13,6 +14,79 @@ const CATEGORIES = [
   { id:"couples", label:"💕 Couples",      desc:"Cute & romantic picks",  bg:"linear-gradient(135deg,#4d1a33,#7a2050)", border:"#ff99cc" },
   { id:"music",   label:"🎵 Music",        desc:"Guess the song lyric",   bg:"linear-gradient(135deg,#2a1a4d,#4d2a7a)", border:"#c8a8ff" },
 ];
+
+const Stepper = ({ label, value, onChange, min, max, disabled }) => {
+  const handleDecrement = () => {
+    if (!disabled && value > min) onChange(value - 1);
+  };
+  const handleIncrement = () => {
+    if (!disabled && value < max) onChange(value + 1);
+  };
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-b-0">
+      <div className="flex flex-col pr-2">
+        <span className="font-body text-base text-white/80">{label}</span>
+        <span className="font-body text-xs text-white/40">Min: {min} · Max: {max} {disabled && "(Locked)"}</span>
+      </div>
+      <div className={`flex items-center gap-3 bg-black/30 px-3 py-1.5 rounded-full border border-white/10 ${disabled ? 'opacity-40' : ''}`}>
+        <button
+          type="button"
+          disabled={disabled || value <= min}
+          onClick={handleDecrement}
+          className="w-8 h-8 rounded-full flex items-center justify-center font-display text-lg select-none transition-all hover:bg-white/10 active:scale-90 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+          style={{ color: "#c8a8ff" }}
+        >
+          -
+        </button>
+        <Counter
+          value={value}
+          fontSize={18}
+          textColor={disabled ? "rgba(255,255,255,0.4)" : "#f0e0ff"}
+          fontWeight="bold"
+          gradientHeight={4}
+          gradientFrom="transparent"
+          gradientTo="transparent"
+        />
+        <button
+          type="button"
+          disabled={disabled || value >= max}
+          onClick={handleIncrement}
+          className="w-8 h-8 rounded-full flex items-center justify-center font-display text-lg select-none transition-all hover:bg-white/10 active:scale-90 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+          style={{ color: "#c8a8ff" }}
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const Toggle = ({ label, description, checked, onChange, disabled }) => {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-b-0">
+      <div className="flex flex-col pr-4">
+        <span className="font-body text-base text-white/80">{label}</span>
+        <span className="font-body text-xs text-white/40 leading-relaxed">{description}</span>
+      </div>
+      <div
+        onClick={() => !disabled && onChange(!checked)}
+        className={`w-12 h-7 rounded-full relative transition-all duration-300 flex-shrink-0 ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+        style={{
+          background: checked ? "#c878ff" : "rgba(255,255,255,0.08)",
+          border: checked ? "1px solid #c878ff" : "1px solid rgba(255,255,255,0.15)",
+          boxShadow: checked ? "0 0 10px rgba(200,120,255,0.3)" : "none"
+        }}
+      >
+        <div
+          className="absolute top-[2px] w-5 h-5 bg-white rounded-full shadow transition-all duration-300"
+          style={{
+            left: checked ? "calc(100% - 22px)" : "2px"
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 
 export default function LobbyPage() {
   const { user, refreshUser } = useAuth();
@@ -23,6 +97,7 @@ export default function LobbyPage() {
   const [rounds, setRounds]     = useState(5);
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPrivate, setIsPrivate]   = useState(false);
+  const [autoStartWhenFull, setAutoStartWhenFull] = useState(false);
   const [joinCode, setJoinCode]     = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
   const [loading, setLoading]   = useState(false);
@@ -47,6 +122,7 @@ export default function LobbyPage() {
         category,
         maxPlayers: isCouples ? 2 : maxPlayers,
         isPrivate,
+        autoStartWhenFull: isCouples ? false : autoStartWhenFull,
         totalRounds: isCouples ? 10 : rounds,
       });
       toast.success(`Room ${data.code} created! 🎉`);
@@ -156,66 +232,131 @@ export default function LobbyPage() {
                 </div>
               </div>
 
-              {/* Right Column: Room Settings */}
+              {/* Right Column: Room Settings Redesign */}
               <div className="flex flex-col w-full h-full">
                 <h2 className="font-display text-xs mb-5 text-center tracking-[3px]" style={{ color:"#c8a8ff", lineHeight: 1.6 }}>
                   ▸ ROOM SETTINGS
                 </h2>
                 <div className="rounded-3xl p-8 flex flex-col flex-1 justify-between glass-panel">
                   <div>
-                    {category === "couples" ? (
-                      <div className="mb-8 p-6 rounded-xl text-center" style={{ background:"rgba(255,99,153,0.08)", border:"1px solid #ff99cc33" }}>
-                        <div className="text-4xl mb-3">💕</div>
-                        <p className="font-display text-xs mb-2" style={{ color:"#ff99cc", lineHeight: 1.6 }}>Couples Mode</p>
-                        <p className="font-body text-base" style={{ color:"rgba(255,255,255,0.5)" }}>2 players · 10 rounds · 5 questions each</p>
+                    {/* SECTION 1: GLOBAL ROOM CONFIG */}
+                    <div className="mb-6">
+                      <div className="font-display text-xs tracking-wider mb-3 pb-1 border-b border-white/10" style={{ color: "rgba(200,168,255,0.7)" }}>
+                        GLOBAL SETTINGS
                       </div>
-                    ) : (
-                      <>
-                        <div className="mb-8">
-                          <div className="flex justify-between mb-3">
-                            <label className="font-body text-base" style={{ color:"rgba(255,255,255,0.45)" }}>Rounds</label>
-                            <span className="font-display text-sm" style={{ color:"#c878ff", lineHeight: 1.6 }}>{rounds}</span>
-                          </div>
-                          <input type="range" min={3} max={10} value={rounds} onChange={e => setRounds(+e.target.value)} className="w-full" style={{ accentColor:"#c878ff" }} />
-                          <div className="flex justify-between mt-1">
-                            <span className="font-body text-xs" style={{ color:"rgba(255,255,255,0.2)" }}>3</span>
-                            <span className="font-body text-xs" style={{ color:"rgba(255,255,255,0.2)" }}>10</span>
-                          </div>
-                        </div>
+                      
+                      <Stepper
+                        label="Rounds"
+                        value={category === "couples" ? 10 : rounds}
+                        onChange={setRounds}
+                        min={3}
+                        max={15}
+                        disabled={category === "couples"}
+                      />
+                      
+                      <Stepper
+                        label="Max Players"
+                        value={category === "couples" ? 2 : maxPlayers}
+                        onChange={setMaxPlayers}
+                        min={2}
+                        max={12}
+                        disabled={category === "couples"}
+                      />
 
-                        <div className="mb-8">
-                          <div className="flex justify-between mb-3">
-                            <label className="font-body text-base" style={{ color:"rgba(255,255,255,0.45)" }}>Max players</label>
-                            <span className="font-display text-sm" style={{ color:"#c878ff", lineHeight: 1.6 }}>{maxPlayers}</span>
-                          </div>
-                          <input type="range" min={2} max={12} value={maxPlayers} onChange={e => setMaxPlayers(+e.target.value)} className="w-full" style={{ accentColor:"#c878ff" }} />
-                          <div className="flex justify-between mt-1">
-                            <span className="font-body text-xs" style={{ color:"rgba(255,255,255,0.2)" }}>2</span>
-                            <span className="font-body text-xs" style={{ color:"rgba(255,255,255,0.2)" }}>12</span>
-                          </div>
-                        </div>
-                      </>
-                    )}
+                      <Toggle
+                        label="Private Room"
+                        description="Only players with room code can join"
+                        checked={isPrivate}
+                        onChange={setIsPrivate}
+                      />
 
-                    <label className="flex items-center justify-between cursor-pointer mb-8 px-1 cursor-target">
-                      <span className="font-body text-base" style={{ color:"rgba(255,255,255,0.55)" }}>Private room</span>
-                      <div onClick={() => setIsPrivate(p => !p)} className="w-12 h-7 rounded-full relative transition-all cursor-pointer" style={{ background: isPrivate ? "#c878ff" : "rgba(255,255,255,0.12)" }}>
-                        <div className="absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all" style={{ left: isPrivate ? "calc(100% - 24px)" : "4px" }} />
+                      <Toggle
+                        label="Auto Start When Full"
+                        description="Automatically start the game when maximum players join"
+                        checked={category === "couples" ? false : autoStartWhenFull}
+                        onChange={setAutoStartWhenFull}
+                        disabled={category === "couples"}
+                      />
+                    </div>
+
+                    {/* SECTION 2: DYNAMIC CATEGORY-SPECIFIC DETAILS */}
+                    <div className="mt-4 rounded-2xl p-5 border" style={{
+                      background: category === "general" ? "rgba(109,213,168,0.04)" : 
+                                  category === "kids" ? "rgba(132,200,255,0.04)" : 
+                                  category === "couples" ? "rgba(255,153,204,0.04)" : 
+                                  "rgba(200,168,255,0.04)",
+                      borderColor: category === "general" ? "rgba(109,213,168,0.15)" : 
+                                   category === "kids" ? "rgba(132,200,255,0.15)" : 
+                                   category === "couples" ? "rgba(255,153,204,0.15)" : 
+                                   "rgba(200,168,255,0.15)"
+                    }}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xl">
+                          {category === "general" ? "🎨" : 
+                           category === "kids" ? "🐾" : 
+                           category === "couples" ? "💕" : 
+                           "🎵"}
+                        </span>
+                        <span className="font-display text-xs" style={{
+                          color: category === "general" ? "#6dd5a8" : 
+                                 category === "kids" ? "#84c8ff" : 
+                                 category === "couples" ? "#ff99cc" : 
+                                 "#c8a8ff",
+                          lineHeight: 1.6
+                        }}>
+                          {category === "general" ? "DRAW N GUESS MODE" : 
+                           category === "kids" ? "ANIMAL QUIZ MODE" : 
+                           category === "couples" ? "COUPLES MODE" : 
+                           "MUSIC QUIZ MODE"}
+                        </span>
                       </div>
-                    </label>
+                      
+                      <ul className="font-body text-sm text-white/50 space-y-1.5 list-none pr-1">
+                        {category === "general" && (
+                          <>
+                            <li>• <span className="text-white/70">80 seconds</span> per round to sketch your word.</li>
+                            <li>• Guessers get points based on speed and accuracy.</li>
+                            <li>• Drawer earns bonus points for every correct guess.</li>
+                          </>
+                        )}
+                        {category === "kids" && (
+                          <>
+                            <li>• <span className="text-white/70">25 seconds</span> per animal.</li>
+                            <li>• Images start zoomed/pixelated and reveal slowly.</li>
+                            <li>• Open chat guess box — type as fast as you can!</li>
+                          </>
+                        )}
+                        {category === "music" && (
+                          <>
+                            <li>• <span className="text-white/70">25 seconds</span> to choose the correct song from lyric snippets.</li>
+                            <li>• Shuffled multiple-choice options.</li>
+                            <li>• <span className="text-white/70">10 seconds</span> audio and cover display.</li>
+                          </>
+                        )}
+                        {category === "couples" && (
+                          <>
+                            <li>• Cooperative game designed for <span className="text-white/70">exactly 2 players</span>.</li>
+                            <li>• One partner answers secretly; the other partner guesses.</li>
+                            <li>• 10 questions across sweet, spicy, harsh, and fun genres.</li>
+                          </>
+                        )}
+                      </ul>
+                    </div>
                   </div>
 
-                  <PixelButton
-                    onClick={handleCreateRoom}
-                    disabled={loading}
-                    background={loading ? "linear-gradient(135deg,#3a2050,#2a1540)" : "linear-gradient(135deg,#c878ff,#7c4dff)"}
-                    borderColor={loading ? "rgba(200,168,255,0.2)" : "#0a0612"}
-                    textColor="white"
-                    className="w-full text-xs"
-                    style={{ padding: "18px" }}
-                  >
-                    {loading ? "Creating… ✨" : "Create Room 🚀"}
-                  </PixelButton>
+                  <div className="mt-8">
+                    <PixelButton
+                      onClick={handleCreateRoom}
+                      disabled={loading}
+                      background={loading ? "linear-gradient(135deg,#3a2050,#2a1540)" : "linear-gradient(135deg,#c878ff,#7c4dff)"}
+                      borderColor={loading ? "rgba(200,168,255,0.2)" : "#0a0612"}
+                      textColor="white"
+                      className="w-full text-xs"
+                      style={{ padding: "18px" }}
+                    >
+                      {loading ? "Creating… ✨" : "Create Room 🚀"}
+                    </PixelButton>
+                  </div>
                 </div>
               </div>
 
