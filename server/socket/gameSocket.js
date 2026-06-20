@@ -208,11 +208,25 @@ const COUPLES_BANK = [
 
 // Word banks for drawing-based categories (general)
 const WORD_BANKS = {
-  general: [
-    "mountain", "ocean", "city", "forest", "desert", "volcano", "island",
-    "bridge", "castle", "lighthouse", "submarine", "spaceship", "robot",
-    "scientist", "chef", "astronaut", "pirate", "ninja", "superhero",
-  ],
+  general: {
+    easy: [
+      "cat", "dog", "apple", "sun", "tree", "house", "car", "ball", "book", "fish", "hat", "cup", 
+      "door", "star", "moon", "milk", "cake", "shoe", "boat", "duck", "frog", "bird", "rain", 
+      "snow", "chair", "table", "key", "bell", "ring", "nose", "hand", "foot", "baby", "farm"
+    ],
+    medium: [
+      "mountain", "ocean", "city", "forest", "desert", "volcano", "island", "bridge", "castle", 
+      "lighthouse", "submarine", "spaceship", "robot", "scientist", "chef", "astronaut", "pirate", 
+      "ninja", "superhero", "guitar", "bicycle", "octopus", "dinosaur", "sandwich", "spider", 
+      "umbrella", "balloon", "butterfly", "computer", "keyboard", "microscope", "telescope"
+    ],
+    hard: [
+      "whisper", "gravity", "labyrinth", "nostalgia", "aurora", "hologram", "evolution", "symphony",
+      "electricity", "magnetism", "reflection", "silhouette", "illusion", "paradox", "constellation",
+      "architecture", "chemistry", "archeology", "kaleidoscope", "metamorphosis", "dimension",
+      "centaur", "phoenix", "gargoyle", "pyramid", "colosseum", "gladiator", "cryptid"
+    ]
+  }
 };
 
 // Active game state (in-memory, reset per room)
@@ -322,6 +336,9 @@ module.exports = (io) => {
           currentDrawerId: null,
           round: 1,
           totalRounds: room.totalRounds,
+          roundDuration: room.roundDuration || 80,
+          wordDifficulty: room.wordDifficulty || "mixed",
+          enableHints: room.enableHints !== undefined ? room.enableHints : true,
           scores: {},
           guessedThisRound: new Set(),
           category: room.category,
@@ -429,6 +446,8 @@ module.exports = (io) => {
         const nonDrawers = game.playerOrder.filter((id) => id !== currentDrawerId);
         if (game.guessedThisRound.size >= nonDrawers.length) {
           clearTimeout(game.timer);
+          if (game.hintTimer1) clearTimeout(game.hintTimer1);
+          if (game.hintTimer2) clearTimeout(game.hintTimer2);
           setTimeout(() => endRound(io, roomCode), 1500);
         }
 
@@ -497,6 +516,10 @@ module.exports = (io) => {
     const room = await Room.findOne({ code: roomCode });
     if (!room) return;
 
+    // Clear any previous hint timers
+    if (game.hintTimer1) clearTimeout(game.hintTimer1);
+    if (game.hintTimer2) clearTimeout(game.hintTimer2);
+
     // Reset guesses for new round
     game.guessedThisRound = new Set();
 
@@ -505,11 +528,29 @@ module.exports = (io) => {
     game.currentDrawerId = drawerId; // store explicitly for chat/guess checks
     game.currentDrawerIndex = (game.currentDrawerIndex + 1) % game.playerOrder.length;
 
-    // Pick a random word from category
-    const bank = WORD_BANKS[game.category] || WORD_BANKS.general;
+    // Pick a random word from category based on difficulty settings
+    let bank = [];
+    if (game.category === "general") {
+      const difficulty = game.wordDifficulty || "mixed";
+      const gBank = WORD_BANKS.general;
+      if (difficulty === "easy") {
+        bank = gBank.easy;
+      } else if (difficulty === "medium") {
+        bank = gBank.medium;
+      } else if (difficulty === "hard") {
+        bank = gBank.hard;
+      } else {
+        bank = [...gBank.easy, ...gBank.medium, ...gBank.hard];
+      }
+    } else {
+      bank = WORD_BANKS[game.category] || WORD_BANKS.general.easy;
+    }
+
     const word = bank[Math.floor(Math.random() * bank.length)];
     game.currentWord = word;
-    game.roundEndTime = Date.now() + ROUND_DURATION * 1000;
+
+    const duration = game.roundDuration || 80;
+    game.roundEndTime = Date.now() + duration * 1000;
 
     // Update room in DB
     room.currentDrawer = drawerId;
@@ -524,7 +565,7 @@ module.exports = (io) => {
         word,
         round: game.round,
         totalRounds: game.totalRounds,
-        duration: ROUND_DURATION,
+        duration: duration,
       });
     }
 
@@ -537,16 +578,66 @@ module.exports = (io) => {
       totalRounds: game.totalRounds,
       wordLength: word.length,
       maskedWord,
-      duration: ROUND_DURATION,
+      duration: duration,
     });
 
     // Set round timer
-    game.timer = setTimeout(() => endRound(io, roomCode), ROUND_DURATION * 1000);
+    game.timer = setTimeout(() => endRound(io, roomCode), duration * 1000);
+
+    // Schedule Hint Reveals if enabled
+    if (game.enableHints) {
+      // Find all alphabetic letter indexes in the word
+      const letterIndexes = [];
+      for (let i = 0; i < word.length; i++) {
+        if (/[a-zA-Z]/.test(word[i])) {
+          letterIndexes.push(i);
+        }
+      }
+
+      // Pick up to 2 distinct indices to reveal
+      let revealIndex1 = -1;
+      let revealIndex2 = -1;
+      if (letterIndexes.length > 2) {
+        const idx1 = Math.floor(Math.random() * letterIndexes.length);
+        revealIndex1 = letterIndexes[idx1];
+        letterIndexes.splice(idx1, 1);
+        const idx2 = Math.floor(Math.random() * letterIndexes.length);
+        revealIndex2 = letterIndexes[idx2];
+      } else if (letterIndexes.length > 0) {
+        revealIndex1 = letterIndexes[Math.floor(Math.random() * letterIndexes.length)];
+      }
+
+      // Schedule first reveal at 50% time elapsed
+      if (revealIndex1 !== -1) {
+        game.hintTimer1 = setTimeout(() => {
+          const maskedArray = [...word].map((ch, idx) => {
+            if (idx === revealIndex1) return ch;
+            return /[a-zA-Z]/.test(ch) ? "_" : ch;
+          });
+          io.to(roomCode).emit("hint_reveal", { maskedWord: maskedArray.join("") });
+        }, (duration * 0.5) * 1000);
+      }
+
+      // Schedule second reveal at 75% time elapsed
+      if (revealIndex2 !== -1) {
+        game.hintTimer2 = setTimeout(() => {
+          const maskedArray = [...word].map((ch, idx) => {
+            if (idx === revealIndex1 || idx === revealIndex2) return ch;
+            return /[a-zA-Z]/.test(ch) ? "_" : ch;
+          });
+          io.to(roomCode).emit("hint_reveal", { maskedWord: maskedArray.join("") });
+        }, (duration * 0.75) * 1000);
+      }
+    }
   }
 
   async function endRound(io, roomCode) {
     const game = activeGames[roomCode];
     if (!game) return;
+
+    // Clear any active hint timers
+    if (game.hintTimer1) clearTimeout(game.hintTimer1);
+    if (game.hintTimer2) clearTimeout(game.hintTimer2);
 
     const word = game.currentWord;
 

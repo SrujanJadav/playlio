@@ -98,6 +98,9 @@ export default function LobbyPage() {
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPrivate, setIsPrivate]   = useState(false);
   const [autoStartWhenFull, setAutoStartWhenFull] = useState(false);
+  const [roundDuration, setRoundDuration]   = useState(80);
+  const [wordDifficulty, setWordDifficulty] = useState("mixed");
+  const [enableHints, setEnableHints]       = useState(true);
   const [joinCode, setJoinCode]     = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
   const [loading, setLoading]   = useState(false);
@@ -118,12 +121,16 @@ export default function LobbyPage() {
     setLoading(true);
     try {
       const isCouples = category === "couples";
+      const isDraw = category === "general";
       const { data } = await axios.post("/api/room/create", {
         category,
         maxPlayers: isCouples ? 2 : maxPlayers,
         isPrivate,
         autoStartWhenFull: isCouples ? false : autoStartWhenFull,
         totalRounds: isCouples ? 10 : rounds,
+        roundDuration: isDraw ? roundDuration : 80,
+        wordDifficulty: isDraw ? wordDifficulty : "mixed",
+        enableHints: isDraw ? enableHints : true,
       });
       toast.success(`Room ${data.code} created! 🎉`);
       navigate(`/game/${data.code}`);
@@ -279,6 +286,75 @@ export default function LobbyPage() {
                       />
                     </div>
 
+                    {/* SECTION 1.5: DRAW N GUESS CONFIG (only when general mode is selected) */}
+                    {category === "general" && (
+                      <div className="mb-6">
+                        <div className="font-display text-xs tracking-wider mb-3 pb-1 border-b border-white/10" style={{ color: "rgba(109,213,168,0.8)" }}>
+                          DRAW N GUESS OPTIONS
+                        </div>
+                        
+                        {/* Round Duration */}
+                        <div className="flex flex-col py-3 border-b border-white/5">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-body text-base text-white/80">Round Duration</span>
+                            <span className="font-display text-xs" style={{ color: "#6dd5a8" }}>{roundDuration}s</span>
+                          </div>
+                          <div className="flex gap-2">
+                            {[60, 80, 100, 120].map(d => (
+                              <button
+                                key={d}
+                                type="button"
+                                onClick={() => setRoundDuration(d)}
+                                className="flex-1 py-2 rounded-lg font-body text-sm border transition-all duration-200 cursor-pointer"
+                                style={{
+                                  background: roundDuration === d ? "rgba(109,213,168,0.12)" : "rgba(255,255,255,0.03)",
+                                  borderColor: roundDuration === d ? "#6dd5a8" : "rgba(255,255,255,0.12)",
+                                  color: roundDuration === d ? "#6dd5a8" : "rgba(255,255,255,0.6)",
+                                  boxShadow: roundDuration === d ? "0 0 16px rgba(109,213,168,0.3)" : "none",
+                                  fontWeight: roundDuration === d ? "bold" : "normal"
+                                }}
+                              >
+                                {d}s
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Word Difficulty */}
+                        <div className="flex flex-col py-3 border-b border-white/5">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-body text-base text-white/80">Word Difficulty</span>
+                            <span className="font-display text-xs capitalize" style={{ color: "#6dd5a8" }}>{wordDifficulty}</span>
+                          </div>
+                          <div className="flex rounded-lg overflow-hidden bg-black/30 border border-white/10 p-0.5 w-full font-body text-xs">
+                            {["easy", "medium", "hard", "mixed"].map(diff => (
+                              <button
+                                key={diff}
+                                type="button"
+                                onClick={() => setWordDifficulty(diff)}
+                                className="flex-1 py-2 text-center rounded transition-all duration-200 cursor-pointer capitalize"
+                                style={{
+                                  background: wordDifficulty === diff ? "rgba(109,213,168,0.15)" : "transparent",
+                                  color: wordDifficulty === diff ? "#6dd5a8" : "rgba(255,255,255,0.6)",
+                                  fontWeight: wordDifficulty === diff ? "bold" : "normal"
+                                }}
+                              >
+                                {diff}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Hint Reveals */}
+                        <Toggle
+                          label="Hint Reveals"
+                          description="When enabled, 1-2 letters are revealed as time runs low"
+                          checked={enableHints}
+                          onChange={setEnableHints}
+                        />
+                      </div>
+                    )}
+
                     {/* SECTION 2: DYNAMIC CATEGORY-SPECIFIC DETAILS */}
                     <div className="mt-4 rounded-2xl p-5 border" style={{
                       background: category === "general" ? "rgba(109,213,168,0.04)" : 
@@ -314,9 +390,9 @@ export default function LobbyPage() {
                       <ul className="font-body text-sm text-white/50 space-y-1.5 list-none pr-1">
                         {category === "general" && (
                           <>
-                            <li>• <span className="text-white/70">80 seconds</span> per round to sketch your word.</li>
-                            <li>• Guessers get points based on speed and accuracy.</li>
-                            <li>• Drawer earns bonus points for every correct guess.</li>
+                            <li>• <span className="text-white/70">{roundDuration} seconds</span> per round to sketch your word.</li>
+                            <li>• Guessing words from the <span className="text-[#6dd5a8] capitalize">{wordDifficulty}</span> library.</li>
+                            <li>• Hint reveals are <span className="text-white/70">{enableHints ? "enabled" : "disabled"}</span>.</li>
                           </>
                         )}
                         {category === "kids" && (

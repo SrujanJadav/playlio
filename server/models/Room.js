@@ -68,6 +68,19 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    roundDuration: {
+      type: Number,
+      default: 80,
+    },
+    wordDifficulty: {
+      type: String,
+      enum: ["easy", "medium", "hard", "mixed"],
+      default: "mixed",
+    },
+    enableHints: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

@@ -7,7 +7,7 @@ const router = express.Router();
 // POST /api/room/create — create a new room
 router.post("/create", authMiddleware, async (req, res) => {
   try {
-    const { category, maxPlayers, isPrivate, totalRounds, autoStartWhenFull } = req.body;
+    const { category, maxPlayers, isPrivate, totalRounds, autoStartWhenFull, roundDuration, wordDifficulty, enableHints } = req.body;
 
     // Generate unique room code
     let code;
@@ -24,6 +24,9 @@ router.post("/create", authMiddleware, async (req, res) => {
       maxPlayers: maxPlayers || 8,
       isPrivate: isPrivate || false,
       autoStartWhenFull: autoStartWhenFull || false,
+      roundDuration: roundDuration !== undefined ? roundDuration : 80,
+      wordDifficulty: wordDifficulty || "mixed",
+      enableHints: enableHints !== undefined ? enableHints : true,
       totalRounds: totalRounds || 5,
       players: [
         {

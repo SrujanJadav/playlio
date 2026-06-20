@@ -173,6 +173,10 @@ export default function GamePage() {
       toast(`Round ${round} over! The word was: "${word}" 💡`);
     });
 
+    socket.on("hint_reveal", ({ maskedWord }) => {
+      setMaskedWord(maskedWord);
+    });
+
     // ── Kids quiz mode events ──
     socket.on("quiz_round_started", ({ image, round, duration }) => {
       setQuizImage(image);
@@ -259,6 +263,7 @@ export default function GamePage() {
       socket.off("your_turn_to_draw");
       socket.off("correct_guess");
       socket.off("round_ended");
+      socket.off("hint_reveal");
       socket.off("quiz_round_started");
       socket.off("quiz_round_ended");
       socket.off("music_round_started");
