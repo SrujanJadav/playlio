@@ -103,6 +103,7 @@ export default function LobbyPage() {
   const [enableHints, setEnableHints]       = useState(true);
   const [quizAnswerTime, setQuizAnswerTime] = useState(20);
   const [quizDifficulty, setQuizDifficulty] = useState("mixed");
+  const [couplesIntensity, setCouplesIntensity] = useState("mixed");
   const [joinCode, setJoinCode]     = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
   const [loading, setLoading]   = useState(false);
@@ -136,6 +137,7 @@ export default function LobbyPage() {
         enableHints: isDraw ? enableHints : true,
         quizAnswerTime: isKids ? quizAnswerTime : 20,
         quizDifficulty: isKids ? quizDifficulty : "mixed",
+        couplesIntensity: isCouples ? couplesIntensity : "mixed",
       });
       toast.success(`Room ${data.code} created! 🎉`);
       navigate(`/game/${data.code}`);
@@ -430,6 +432,67 @@ export default function LobbyPage() {
                       </div>
                     )}
 
+                    {/* SECTION 1.7: COUPLES MODE CONFIG (only when couples mode is selected) */}
+                    {category === "couples" && (
+                      <div className="mb-6">
+                        <div className="font-display text-xs tracking-wider mb-3 pb-1 border-b border-white/10" style={{ color: "rgba(255,153,204,0.8)" }}>
+                          COUPLES OPTIONS
+                        </div>
+
+                        {/* Locked Settings Info */}
+                        <div className="grid grid-cols-2 gap-3 mb-4 font-body">
+                          <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <span className="text-xs text-white/40">Rounds</span>
+                              <span className="font-display text-sm text-[#ff99cc]">10 Rounds</span>
+                            </div>
+                            <span className="text-white/30 text-xs">🔒 Locked</span>
+                          </div>
+                          <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <span className="text-xs text-white/40">Players</span>
+                              <span className="font-display text-sm text-[#ff99cc]">2 Players</span>
+                            </div>
+                            <span className="text-white/30 text-xs">🔒 Locked</span>
+                          </div>
+                        </div>
+
+                        {/* Question Intensity */}
+                        <div className="flex flex-col py-3">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-body text-base text-white/80">Question Intensity</span>
+                            <span className="font-display text-xs capitalize" style={{ color: "#ff99cc" }}>
+                              {couplesIntensity}
+                            </span>
+                          </div>
+                          <div className="flex rounded-lg overflow-hidden bg-black/30 border border-white/10 p-0.5 w-full font-body text-xs mb-2">
+                            {["sweet", "mixed", "spicy"].map(intensity => (
+                              <button
+                                key={intensity}
+                                type="button"
+                                onClick={() => setCouplesIntensity(intensity)}
+                                className="flex-1 py-2 text-center rounded transition-all duration-200 cursor-pointer capitalize"
+                                style={{
+                                  background: couplesIntensity === intensity ? "rgba(255,153,204,0.15)" : "transparent",
+                                  color: couplesIntensity === intensity ? "#ff99cc" : "rgba(255,255,255,0.6)",
+                                  fontWeight: couplesIntensity === intensity ? "bold" : "normal"
+                                }}
+                              >
+                                {intensity}
+                              </button>
+                            ))}
+                          </div>
+                          
+                          {/* Intensity Description */}
+                          <div className="font-body text-xs text-white/40 leading-relaxed bg-black/10 p-2.5 rounded border border-white/5">
+                            {couplesIntensity === "sweet" && "💛 Sweet: Cute and wholesome questions."}
+                            {couplesIntensity === "mixed" && "💕 Mixed: Balanced fun."}
+                            {couplesIntensity === "spicy" && "🌶️ Spicy: Includes deeper and more challenging questions."}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* SECTION 2: DYNAMIC CATEGORY-SPECIFIC DETAILS */}
                     <div className="mt-4 rounded-2xl p-5 border" style={{
                       background: category === "general" ? "rgba(109,213,168,0.04)" : 
@@ -488,7 +551,7 @@ export default function LobbyPage() {
                           <>
                             <li>• Cooperative game designed for <span className="text-white/70">exactly 2 players</span>.</li>
                             <li>• One partner answers secretly; the other partner guesses.</li>
-                            <li>• 10 questions across sweet, spicy, harsh, and fun genres.</li>
+                            <li>• 10 questions with <span className="text-[#ff99cc] capitalize">{couplesIntensity}</span> intensity.</li>
                           </>
                         )}
                       </ul>

@@ -90,6 +90,11 @@ const roomSchema = new mongoose.Schema(
       enum: ["common", "mixed", "expert"],
       default: "mixed",
     },
+    couplesIntensity: {
+      type: String,
+      enum: ["sweet", "mixed", "spicy"],
+      default: "mixed",
+    },
   },
   { timestamps: true }
 );

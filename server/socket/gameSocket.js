@@ -150,6 +150,41 @@ const COUPLES_BANK = [
     question: "Which of these do you wish happened more often? (pick all that apply)",
     options: ["Date nights", "Compliments", "Physical affection", "Deep conversations"],
   },
+  {
+    genre: "sweet",
+    question: "What is your favorite memory of us together? (pick all that apply)",
+    options: ["Our first date", "A trip we took", "A random lazy day", "Celebrating a milestone"],
+  },
+  {
+    genre: "sweet",
+    question: "Which of these traits do you appreciate most in me? (pick all that apply)",
+    options: ["Kindness", "Sense of humor", "Intelligence", "Patience"],
+  },
+  {
+    genre: "sweet",
+    question: "How do you prefer to spend quality time together? (pick all that apply)",
+    options: ["Exploring new places", "Cooking together", "Quiet time at home", "Long deep talks"],
+  },
+  {
+    genre: "sweet",
+    question: "What small gesture makes you smile the most? (pick all that apply)",
+    options: ["Making my coffee/tea", "Leaving a sweet note", "Holding my hand in public", "Bringing home a treat"],
+  },
+  {
+    genre: "sweet",
+    question: "Which of these do you think is our biggest strength as a couple? (pick all that apply)",
+    options: ["Our communication", "We have so much fun", "Our trust in each other", "How we support each other"],
+  },
+  {
+    genre: "sweet",
+    question: "What is your favorite way to wake up on a weekend? (pick all that apply)",
+    options: ["Sleeping in late", "Breakfast in bed", "Morning cuddles", "Waking up early to watch the sunrise"],
+  },
+  {
+    genre: "sweet",
+    question: "Which of these makes you feel most safe and secure? (pick all that apply)",
+    options: ["Hearing 'I love you'", "Being held tightly", "Knowing we can talk about anything", "Planning our future together"],
+  },
 
   // 🌶️ Spicy / Romantic
   {
@@ -176,6 +211,41 @@ const COUPLES_BANK = [
     genre: "spicy",
     question: "Which of these would you want to try together someday? (pick all that apply)",
     options: ["A couples dance class", "A weekend getaway", "Cooking a fancy meal together", "A photoshoot together"],
+  },
+  {
+    genre: "spicy",
+    question: "Where is the most romantic place you want to go together? (pick all that apply)",
+    options: ["A secluded cabin", "A tropical beach resort", "A historic European city", "A luxury glamping site"],
+  },
+  {
+    genre: "spicy",
+    question: "What is the key to keeping the romance alive? (pick all that apply)",
+    options: ["Spontaneous dates", "Physical intimacy", "Flirting throughout the day", "Trying new things together"],
+  },
+  {
+    genre: "spicy",
+    question: "Which of these is your favorite physical touch? (pick all that apply)",
+    options: ["Playing with my hair", "A back rub/massage", "Holding hands", "Wrapping arms around the waist"],
+  },
+  {
+    genre: "spicy",
+    question: "What is the most attractive outfit I wear? (pick all that apply)",
+    options: ["Formal dress/suit", "Cozy loungewear", "Athletic wear", "Something stylish & casual"],
+  },
+  {
+    genre: "spicy",
+    question: "Which setting sounds most romantic for a date? (pick all that apply)",
+    options: ["Under a starry sky", "A warm bath with music", "A sunset picnic", "A private rooftop bar"],
+  },
+  {
+    genre: "spicy",
+    question: "What kind of flirting makes you blush the most? (pick all that apply)",
+    options: ["Winking/eye contact from across a room", "Whispering in my ear", "A tease text message", "An unexpected gentle touch"],
+  },
+  {
+    genre: "spicy",
+    question: "What's a romantic milestone you are looking forward to? (pick all that apply)",
+    options: ["A dream vacation together", "Moving in/getting a home", "An anniversary celebration", "Adopting a pet together"],
   },
 
   // 💬 Harsh-but-real
@@ -204,6 +274,41 @@ const COUPLES_BANK = [
     question: "Which of these worry you sometimes about us? (pick all that apply)",
     options: ["Distance", "Busy schedules", "Not enough communication", "Taking each other for granted"],
   },
+  {
+    genre: "harsh",
+    question: "What is the hardest topic for us to talk about? (pick all that apply)",
+    options: ["Future plans", "Money/finances", "Past relationships", "Our annoying habits"],
+  },
+  {
+    genre: "harsh",
+    question: "What's your typical reaction during a disagreement? (pick all that apply)",
+    options: ["Shutting down/quietness", "Trying to resolve it immediately", "Getting emotional", "Needing space to cool off"],
+  },
+  {
+    genre: "harsh",
+    question: "Where do we sometimes struggle with compatibility? (pick all that apply)",
+    options: ["Socializing vs staying home", "Cleanliness habits", "Handling stress", "How we spend money"],
+  },
+  {
+    genre: "harsh",
+    question: "Which of these habits do I have that test your patience? (pick all that apply)",
+    options: ["Being indecisive", "Interrupting", "Losing things", "Procrastinating"],
+  },
+  {
+    genre: "harsh",
+    question: "What is the main thing we need to work on as a pair? (pick all that apply)",
+    options: ["Being more active together", "Better listening skills", "Giving each other more space", "Expressing appreciation more"],
+  },
+  {
+    genre: "harsh",
+    question: "When we are busy, what gets neglected first? (pick all that apply)",
+    options: ["Quality time", "Physical intimacy", "House chores", "Clear communication"],
+  },
+  {
+    genre: "harsh",
+    question: "What's a fear you have about long-term relationships? (pick all that apply)",
+    options: ["Losing the spark", "Growing apart", "Routine getting boring", "Losing independence"],
+  },
 
   // 😄 Fun / Random
   {
@@ -230,6 +335,41 @@ const COUPLES_BANK = [
     genre: "fun",
     question: "Which of these superpowers would you want? (pick all that apply)",
     options: ["Reading minds", "Teleportation", "Flying", "Time travel"],
+  },
+  {
+    genre: "fun",
+    question: "If we won the lottery, what's the first thing we'd buy? (pick all that apply)",
+    options: ["A mansion", "A round-the-world trip", "Invest/Save it", "Pay off all debts"],
+  },
+  {
+    genre: "fun",
+    question: "Who is the better driver between us? (pick all that apply)",
+    options: ["Definitely me", "Definitely you", "Both are good", "Neither is safe!"],
+  },
+  {
+    genre: "fun",
+    question: "What's our go-to comfort food to order? (pick all that apply)",
+    options: ["Pizza", "Sushi", "Burgers/fries", "Chinese takeout"],
+  },
+  {
+    genre: "fun",
+    question: "If we were in a horror movie, who survives? (pick all that apply)",
+    options: ["I do, easily", "You do, easily", "We both survive together", "We both get taken out first"],
+  },
+  {
+    genre: "fun",
+    question: "Which chore do you absolutely hate doing the most? (pick all that apply)",
+    options: ["Washing dishes", "Doing laundry", "Taking out trash", "Vacuuming/dusting"],
+  },
+  {
+    genre: "fun",
+    question: "What kind of movie do we agree on most? (pick all that apply)",
+    options: ["Comedy", "Thriller/Mystery", "Action/Sci-Fi", "Rom-Com"],
+  },
+  {
+    genre: "fun",
+    question: "If we were to play a board game, what happens? (pick all that apply)",
+    options: ["It gets way too competitive", "We end up working together", "Someone gives up halfway", "We just laugh the whole time"],
   },
 ];
 
@@ -368,6 +508,7 @@ module.exports = (io) => {
           enableHints: room.enableHints !== undefined ? room.enableHints : true,
           quizAnswerTime: room.quizAnswerTime || 20,
           quizDifficulty: room.quizDifficulty || "mixed",
+          couplesIntensity: room.couplesIntensity || "mixed",
           scores: {},
           guessedThisRound: new Set(),
           category: room.category,
@@ -930,8 +1071,20 @@ module.exports = (io) => {
     // Force exactly 10 rounds for couples mode regardless of room setting
     game.totalRounds = 10;
 
+    // Filter bank based on selected intensity
+    const intensity = game.couplesIntensity || "mixed";
+    let filteredBank = COUPLES_BANK;
+    if (intensity === "sweet") {
+      filteredBank = COUPLES_BANK.filter(q => q.genre === "sweet" || q.genre === "fun");
+    } else if (intensity === "spicy") {
+      filteredBank = COUPLES_BANK.filter(q => q.genre === "spicy" || q.genre === "harsh");
+    }
+    if (filteredBank.length < 10) {
+      filteredBank = COUPLES_BANK;
+    }
+
     // Pick 10 unique questions from the bank (5 for "him", 5 for "her")
-    game.couplesQuestions = shuffleAndPick(COUPLES_BANK, 10);
+    game.couplesQuestions = shuffleAndPick(filteredBank, 10);
 
     await startCouplesRound(io, roomCode);
   }

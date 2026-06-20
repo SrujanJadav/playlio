@@ -414,7 +414,9 @@ export default function GamePage() {
             </div>
 
             <div className="mb-4 text-sm font-body" style={{ color: "rgba(240,224,255,0.5)" }}>
-              Category: <span className="font-semibold text-glow-soft" style={{ color: cat.border }}>{cat.label}</span> · {room?.totalRounds} rounds
+              Category: <span className="font-semibold text-glow-soft" style={{ color: cat.border }}>
+                {cat.label} {room?.category === "couples" && room?.couplesIntensity ? `(${room.couplesIntensity.toUpperCase()})` : ""}
+              </span> · {room?.totalRounds} rounds
             </div>
 
             {/* Players */}
