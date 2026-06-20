@@ -92,47 +92,57 @@ export default function Navbar() {
         <div className="w-full px-6 h-16 flex items-center justify-between">
           
           {/* LEFT — Profile & Coins Cluster */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-body text-sm"
+              className="flex items-center gap-3 px-3 py-1.5 rounded-full font-body text-sm"
               style={{
-                background: "rgba(240,200,64,0.1)",
-                color: "#f0c840",
-                border: "1px solid rgba(240,200,64,0.3)",
+                background: "rgba(255, 255, 255, 0.04)",
+                border: "1px solid rgba(200, 168, 255, 0.15)",
+                boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
               }}
             >
-              ⭐ {user?.totalPoints?.toLocaleString() ?? 0}
-            </div>
-
-            <div className="h-6 w-px hidden sm:block" style={{ background: "rgba(200,168,255,0.2)" }} />
-
-            <div className="hidden sm:flex items-center gap-3">
-              <div className="relative flex-shrink-0">
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: "-2px",
-                    borderRadius: "50%",
-                    boxShadow: "0 0 10px 2px rgba(57,255,136,0.4)",
-                    pointerEvents: "none",
-                  }}
-                />
-                <img
-                  src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`}
-                  alt={user?.username}
-                  className="w-8 h-8 rounded-full object-cover relative z-10"
-                  style={{ border: "2px solid #39ff88" }}
-                />
+              {/* Points */}
+              <div className="flex items-center gap-1.5 text-[#f0c840]">
+                ⭐ {user?.totalPoints?.toLocaleString() ?? 0}
               </div>
-              <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.95)" }}>
-                {user?.username}
-              </span>
+
+              {/* Vertical divider */}
+              <div className="h-4 w-px bg-white/20 hidden sm:block" />
+
+              {/* Profile details */}
+              <div className="hidden sm:flex items-center gap-3">
+                <div className="relative flex-shrink-0">
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: "-1px",
+                      borderRadius: "50%",
+                      boxShadow: "0 0 8px 1px rgba(57,255,136,0.3)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <img
+                    src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`}
+                    alt={user?.username}
+                    className="w-7 h-7 rounded-full object-cover relative z-10"
+                    style={{ border: "1.5px solid #39ff88" }}
+                  />
+                </div>
+                <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.95)" }}>
+                  {user?.username}
+                </span>
+              </div>
             </div>
 
+            {/* Logout button for mobile */}
             <button
               onClick={handleLogout}
-              className="sm:hidden font-body text-xs px-2 py-1 rounded"
-              style={{ background: "rgba(255,99,99,0.12)", color: "#ff9999", border: "1px solid rgba(255,99,99,0.3)" }}
+              className="sm:hidden ml-3 font-body text-xs px-2.5 py-1.5 rounded-full"
+              style={{
+                background: "rgba(255, 99, 99, 0.12)",
+                color: "#ff9999",
+                border: "1px solid rgba(255, 99, 99, 0.3)",
+              }}
             >
               <PixelEmoji>👋</PixelEmoji> Out
             </button>

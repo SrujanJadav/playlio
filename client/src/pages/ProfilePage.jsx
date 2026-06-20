@@ -178,7 +178,8 @@ export default function ProfilePage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSearch()}
-                className="flex-1 px-4 py-3 rounded-2xl font-body text-sm cursor-target"
+                autoComplete="off"
+                className="flex-1 px-4 py-5 rounded-2xl font-body text-sm cursor-target"
                 style={{
                   border: "2px solid rgba(132,200,255,0.3)",
                   outline: "none",
@@ -186,7 +187,7 @@ export default function ProfilePage() {
                   color: "#f0e0ff"
                 }} />
               <button onClick={handleSearch}
-                className="btn-bounce px-6 py-3 rounded-2xl font-body font-bold text-sm cursor-target"
+                className="btn-bounce px-6 py-5 rounded-2xl font-body font-bold text-sm cursor-target"
                 style={{ background:"#84c8ff", color:"#0a0612", border:"none", cursor:"pointer" }}>
                 Search
               </button>

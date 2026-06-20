@@ -153,14 +153,19 @@ export default function ArkanoidBackground({ opacity = 1}) {
       ctx.fill();
     }
 
-    function loop() {
+    const FRAME_INTERVAL = 1000 / 30; // throttle to ~30 fps
+    let lastFrameTime = 0;
+
+    function loop(timestamp) {
+      rafId = requestAnimationFrame(loop);
+      if (timestamp - lastFrameTime < FRAME_INTERVAL) return;
+      lastFrameTime = timestamp;
       update();
       draw();
-      rafId = requestAnimationFrame(loop);
     }
 
     resize();
-    loop();
+    rafId = requestAnimationFrame(loop);
 
     window.addEventListener("resize", resize);
     return () => {
@@ -179,6 +184,8 @@ export default function ArkanoidBackground({ opacity = 1}) {
         height: "100vh",
         opacity,
         imageRendering: "pixelated",
+        willChange: "opacity",
+        pointerEvents: "none",
       }}
     />
   );

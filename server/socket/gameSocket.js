@@ -398,6 +398,7 @@ const WORD_BANKS = {
 
 // Active game state (in-memory, reset per room)
 const activeGames = {};
+const emptyRoomTimers = {};
 
 const ROUND_DURATION = 80; // seconds per drawing round
 const QUIZ_ROUND_DURATION = 25; // seconds per kids quiz image (current 20 + 5)
@@ -419,6 +420,13 @@ module.exports = (io) => {
         if (!room) {
           socket.emit("error", { message: "Room not found" });
           return;
+        }
+
+        // Cancel the empty room dissolve timer if anyone joins back
+        if (emptyRoomTimers[roomCode]) {
+          clearTimeout(emptyRoomTimers[roomCode]);
+          delete emptyRoomTimers[roomCode];
+          console.log(`⏱️ Player joined empty room ${roomCode}. Cancelled scheduled deletion.`);
         }
 
         if (room.status === "playing") {
@@ -496,6 +504,26 @@ module.exports = (io) => {
         room.currentRound = 1;
         await room.save();
 
+        // Start 5-minute auto-dissolve timer if autoDissolve is enabled
+        let dissolveTimer = null;
+        if (room.autoDissolve) {
+          dissolveTimer = setTimeout(async () => {
+            try {
+              const currentRoom = await Room.findOne({ code: roomCode });
+              if (currentRoom && currentRoom.status !== "finished") {
+                await Room.deleteOne({ _id: currentRoom._id });
+                io.to(roomCode).emit("room_dissolved", {
+                  message: "Game exceeded 5 minutes and was automatically dissolved. ⏱️"
+                });
+                delete activeGames[roomCode];
+                console.log(`⏱️ Room ${roomCode} dissolved automatically after 5 minutes.`);
+              }
+            } catch (err) {
+              console.error("Auto dissolve error:", err);
+            }
+          }, 5 * 60 * 1000); // 5 minutes
+        }
+
         // Initialize in-memory game state
         activeGames[roomCode] = {
           playerOrder: room.players.map((p) => p.userId?.toString()),
@@ -513,6 +541,7 @@ module.exports = (io) => {
           guessedThisRound: new Set(),
           category: room.category,
           timer: null,
+          dissolveTimer,
         };
 
         // Give everyone in room their initial 0 points
@@ -665,11 +694,32 @@ module.exports = (io) => {
         room.players = room.players.filter(
           (p) => p.socketId !== socket.id
         );
-        await room.save();
-
-        io.to(roomCode).emit("player_left", { userId, username, players: room.players });
-        io.to(roomCode).emit("players_updated", { players: room.players });
-
+        if (room.players.length === 0) {
+          if (room.autoDissolveEmpty) {
+            console.log(`⏱️ Room ${roomCode} is empty. Scheduling auto-dissolve in 30 minutes.`);
+            if (emptyRoomTimers[roomCode]) clearTimeout(emptyRoomTimers[roomCode]);
+            emptyRoomTimers[roomCode] = setTimeout(async () => {
+              try {
+                const currentRoom = await Room.findOne({ code: roomCode });
+                if (currentRoom && currentRoom.players.length === 0) {
+                  await Room.deleteOne({ _id: currentRoom._id });
+                  delete activeGames[roomCode];
+                  delete emptyRoomTimers[roomCode];
+                  console.log(`🧹 Empty room ${roomCode} dissolved automatically after 30 minutes.`);
+                }
+              } catch (err) {
+                console.error("Empty room auto dissolve error:", err);
+              }
+            }, 30 * 60 * 1000); // 30 minutes
+          } else {
+            await Room.deleteOne({ _id: room._id });
+            console.log(`🧹 Room ${roomCode} deleted immediately because it became empty and autoDissolveEmpty is false.`);
+          }
+        } else {
+          await room.save();
+          io.to(roomCode).emit("player_left", { userId, username, players: room.players });
+          io.to(roomCode).emit("players_updated", { players: room.players });
+        }
         console.log(`🔌 ${username} left room ${roomCode}`);
       } catch (err) {
         console.error("disconnect error:", err);
@@ -1273,6 +1323,9 @@ module.exports = (io) => {
       io.to(roomCode).emit("game_over", { finalScores });
 
       // Clean up in-memory state
+      if (game.dissolveTimer) {
+        clearTimeout(game.dissolveTimer);
+      }
       delete activeGames[roomCode];
     } catch (err) {
       console.error("endGame error:", err);

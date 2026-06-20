@@ -68,6 +68,14 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    autoDissolve: {
+      type: Boolean,
+      default: true,
+    },
+    autoDissolveEmpty: {
+      type: Boolean,
+      default: true,
+    },
     roundDuration: {
       type: Number,
       default: 80,

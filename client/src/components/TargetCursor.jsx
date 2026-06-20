@@ -68,14 +68,22 @@ const TargetCursor = ({
     []
   );
 
+  const rafPendingRef = useRef(false);
+
   const moveCursor = useCallback((x, y) => {
     if (!cursorRef.current) return;
-    const { x: offsetX, y: offsetY } = getContainingBlockOffset(containingBlockRef.current);
-    gsap.to(cursorRef.current, {
-      x: x - offsetX,
-      y: y - offsetY,
-      duration: 0.1,
-      ease: 'power3.out'
+    if (rafPendingRef.current) return;
+    rafPendingRef.current = true;
+    requestAnimationFrame(() => {
+      rafPendingRef.current = false;
+      if (!cursorRef.current) return;
+      const { x: offsetX, y: offsetY } = getContainingBlockOffset(containingBlockRef.current);
+      gsap.to(cursorRef.current, {
+        x: x - offsetX,
+        y: y - offsetY,
+        duration: 0.1,
+        ease: 'power3.out'
+      });
     });
   }, []);
 
@@ -171,8 +179,115 @@ const TargetCursor = ({
 
     tickerFnRef.current = tickerFn;
 
-    const moveHandler = e => moveCursor(e.clientX, e.clientY);
-    window.addEventListener('mousemove', moveHandler);
+    // --- Efficient enter/leave detection via mousemove instead of mouseover ---
+    // mouseover bubbles on every nested element; using elementFromPoint on
+    // mousemove is far cheaper because it only runs once per move event.
+    let lastCheckedX = -1;
+    let lastCheckedY = -1;
+
+    const pointerMoveHandler = (e) => {
+      moveCursor(e.clientX, e.clientY);
+
+      // Only re-check target when cursor has moved at least 2px (hysteresis)
+      if (Math.abs(e.clientX - lastCheckedX) < 2 && Math.abs(e.clientY - lastCheckedY) < 2) return;
+      lastCheckedX = e.clientX;
+      lastCheckedY = e.clientY;
+
+      // Find the topmost cursor-target under the pointer
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const target = el ? el.closest(targetSelector) : null;
+
+      if (target === activeTarget) return;
+
+      // Leave old target
+      if (activeTarget && currentLeaveHandler) {
+        currentLeaveHandler();
+      }
+
+      if (!target || !cursorRef.current || !cornersRef.current) return;
+      if (resumeTimeout) { clearTimeout(resumeTimeout); resumeTimeout = null; }
+
+      activeTarget = target;
+      const corners = Array.from(cornersRef.current);
+      corners.forEach(corner => gsap.killTweensOf(corner));
+
+      gsap.killTweensOf(cursorRef.current, 'rotation');
+      spinTl.current?.pause();
+      gsap.set(cursorRef.current, { rotation: 0 });
+
+      const rect = target.getBoundingClientRect();
+      const { borderWidth, cornerSize } = constants;
+      const { x: offsetX, y: offsetY } = getOffset();
+      const cursorX = gsap.getProperty(cursorRef.current, 'x');
+      const cursorY = gsap.getProperty(cursorRef.current, 'y');
+
+      targetCornerPositionsRef.current = [
+        { x: rect.left - borderWidth - offsetX,              y: rect.top - borderWidth - offsetY },
+        { x: rect.right + borderWidth - cornerSize - offsetX, y: rect.top - borderWidth - offsetY },
+        { x: rect.right + borderWidth - cornerSize - offsetX, y: rect.bottom + borderWidth - cornerSize - offsetY },
+        { x: rect.left - borderWidth - offsetX,              y: rect.bottom + borderWidth - cornerSize - offsetY }
+      ];
+
+      isActiveRef.current = true;
+      gsap.ticker.add(tickerFnRef.current);
+
+      gsap.to(activeStrengthRef, { current: 1, duration: hoverDuration, ease: 'power2.out' });
+
+      corners.forEach((corner, i) => {
+        gsap.to(corner, {
+          x: targetCornerPositionsRef.current[i].x - cursorX,
+          y: targetCornerPositionsRef.current[i].y - cursorY,
+          duration: 0.2,
+          ease: 'power2.out'
+        });
+      });
+
+      const leaveHandler = () => {
+        gsap.ticker.remove(tickerFnRef.current);
+        isActiveRef.current = false;
+        targetCornerPositionsRef.current = null;
+        gsap.set(activeStrengthRef, { current: 0, overwrite: true });
+        activeTarget = null;
+
+        if (cornersRef.current) {
+          const corners = Array.from(cornersRef.current);
+          gsap.killTweensOf(corners);
+          const { cornerSize } = constants;
+          const positions = [
+            { x: -cornerSize * 1.5, y: -cornerSize * 1.5 },
+            { x:  cornerSize * 0.5, y: -cornerSize * 1.5 },
+            { x:  cornerSize * 0.5, y:  cornerSize * 0.5 },
+            { x: -cornerSize * 1.5, y:  cornerSize * 0.5 }
+          ];
+          const tl = gsap.timeline();
+          corners.forEach((corner, index) => {
+            tl.to(corner, { x: positions[index].x, y: positions[index].y, duration: 0.3, ease: 'power3.out' }, 0);
+          });
+        }
+
+        resumeTimeout = setTimeout(() => {
+          if (!activeTarget && cursorRef.current && spinTl.current) {
+            const currentRotation = gsap.getProperty(cursorRef.current, 'rotation');
+            const normalizedRotation = currentRotation % 360;
+            spinTl.current.kill();
+            spinTl.current = gsap.timeline({ repeat: -1 }).to(cursorRef.current, { rotation: '+=360', duration: spinDuration, ease: 'none' });
+            gsap.to(cursorRef.current, {
+              rotation: normalizedRotation + 360,
+              duration: spinDuration * (1 - normalizedRotation / 360),
+              ease: 'none',
+              onComplete: () => { spinTl.current?.restart(); }
+            });
+          }
+          resumeTimeout = null;
+        }, 50);
+
+        cleanupTarget(target);
+      };
+
+      currentLeaveHandler = leaveHandler;
+    };
+
+    window.addEventListener('mousemove', pointerMoveHandler, { passive: true });
 
     const scrollHandler = () => {
       if (!activeTarget || !cursorRef.current) return;
@@ -338,8 +453,7 @@ const TargetCursor = ({
         gsap.ticker.remove(tickerFnRef.current);
       }
 
-      window.removeEventListener('mousemove', moveHandler);
-      window.removeEventListener('mouseover', enterHandler);
+      window.removeEventListener('mousemove', pointerMoveHandler);
       window.removeEventListener('scroll', scrollHandler);
       window.removeEventListener('resize', resizeHandler);
       window.removeEventListener('mousedown', mouseDownHandler);

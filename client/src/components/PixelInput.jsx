@@ -30,7 +30,8 @@ export default function PixelInput({
         maxLength={maxLength}
         disabled={disabled}
         autoFocus={autoFocus}
-        className={`font-body w-full bg-transparent outline-none px-3 py-2 ${isDark ? "placeholder-white/40" : ""}`}
+        autoComplete="off"
+        className={`font-body w-full bg-transparent outline-none px-3 py-4 ${isDark ? "placeholder-white/40" : ""}`}
         style={{
           borderTop: `4px solid ${borderColor}`,
           borderBottom: `4px solid ${borderColor}`,

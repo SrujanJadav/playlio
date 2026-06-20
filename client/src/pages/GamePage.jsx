@@ -44,47 +44,47 @@ function useTimer(initialSeconds) {
 }
 
 const CATEGORY_META = {
-  general: { label:"🎨 Draw n Guess", bg:"rgba(57,255,136,0.15)", border:"#39ff88", particleColors:["#39ff88", "#6dd5a8", "#06D6A0"] },
-  kids:    { label:"🐾 Animal Quiz",  bg:"rgba(132,200,255,0.15)", border:"#84c8ff", particleColors:["#84c8ff", "#4d80ff", "#00F0FF"] },
-  couples: { label:"💕 Couples",      bg:"rgba(255,153,204,0.15)", border:"#ff99cc", particleColors:["#ff99cc", "#ff3399", "#FF007F"] },
-  music:   { label:"🎵 Music",        bg:"rgba(200,168,255,0.15)", border:"#c8a8ff", particleColors:["#c8a8ff", "#7c4dff", "#BD00FF"] },
+  general: { label: "🎨 Draw n Guess", bg: "rgba(57,255,136,0.15)", border: "#39ff88", particleColors: ["#39ff88", "#6dd5a8", "#06D6A0"] },
+  kids: { label: "🐾 Animal Quiz", bg: "rgba(132,200,255,0.15)", border: "#84c8ff", particleColors: ["#84c8ff", "#4d80ff", "#00F0FF"] },
+  couples: { label: "💕 Couples", bg: "rgba(255,153,204,0.15)", border: "#ff99cc", particleColors: ["#ff99cc", "#ff3399", "#FF007F"] },
+  music: { label: "🎵 Music", bg: "rgba(200,168,255,0.15)", border: "#c8a8ff", particleColors: ["#c8a8ff", "#7c4dff", "#BD00FF"] },
 };
 
 export default function GamePage() {
-  const { code }      = useParams();
-  const navigate      = useNavigate();
-  const { user }      = useAuth();
-  const { socket }    = useSocket();
+  const { code } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { socket } = useSocket();
 
-  const [room,          setRoom]          = useState(null);
-  const [players,       setPlayers]       = useState([]);
-  const [gamePhase,     setGamePhase]     = useState("waiting"); // waiting | playing | finished
+  const [room, setRoom] = useState(null);
+  const [players, setPlayers] = useState([]);
+  const [gamePhase, setGamePhase] = useState("waiting"); // waiting | playing | finished
   const [currentDrawer, setCurrentDrawer] = useState(null);
-  const [currentWord,   setCurrentWord]   = useState("");      // only drawer sees this
-  const [maskedWord,    setMaskedWord]    = useState("");      // guessers see blanks
-  const [scores,        setScores]        = useState({});
-  const [round,         setRound]         = useState(0);
-  const [totalRounds,   setTotalRounds]   = useState(5);
-  const [finalScores,   setFinalScores]   = useState(null);
-  const [roundWord,     setRoundWord]     = useState("");      // shown after round ends
-  const [loading,       setLoading]       = useState(true);
+  const [currentWord, setCurrentWord] = useState("");      // only drawer sees this
+  const [maskedWord, setMaskedWord] = useState("");      // guessers see blanks
+  const [scores, setScores] = useState({});
+  const [round, setRound] = useState(0);
+  const [totalRounds, setTotalRounds] = useState(5);
+  const [finalScores, setFinalScores] = useState(null);
+  const [roundWord, setRoundWord] = useState("");      // shown after round ends
+  const [loading, setLoading] = useState(true);
 
   // Kids quiz mode state
-  const [quizImage,     setQuizImage]     = useState("");
-  const [quizAnswer,    setQuizAnswer]    = useState("");      // shown after round ends
+  const [quizImage, setQuizImage] = useState("");
+  const [quizAnswer, setQuizAnswer] = useState("");      // shown after round ends
 
   // Music quiz mode state
-  const [musicClue,     setMusicClue]     = useState("");
-  const [musicOptions,  setMusicOptions]  = useState([]);
-  const [musicReveal,   setMusicReveal]   = useState(null);     // { answer, artist, cover, audio } or null
+  const [musicClue, setMusicClue] = useState("");
+  const [musicOptions, setMusicOptions] = useState([]);
+  const [musicReveal, setMusicReveal] = useState(null);     // { answer, artist, cover, audio } or null
   const [revealSeconds, setRevealSeconds] = useState(0);
 
   // Couples mode state
-  const [couplesQuestion,  setCouplesQuestion]  = useState(null); // { genre, question, options }
-  const [couplesPhase,     setCouplesPhase]     = useState("answering"); // answering | guessing | reveal
-  const [couplesAnswerer,  setCouplesAnswerer]  = useState({ id: null, name: "" });
-  const [couplesGuesser,   setCouplesGuesser]   = useState({ id: null, name: "" });
-  const [couplesReveal,    setCouplesReveal]    = useState(null);
+  const [couplesQuestion, setCouplesQuestion] = useState(null); // { genre, question, options }
+  const [couplesPhase, setCouplesPhase] = useState("answering"); // answering | guessing | reveal
+  const [couplesAnswerer, setCouplesAnswerer] = useState({ id: null, name: "" });
+  const [couplesGuesser, setCouplesGuesser] = useState({ id: null, name: "" });
+  const [couplesReveal, setCouplesReveal] = useState(null);
 
   const { seconds, start: startTimer, stop: stopTimer } = useTimer(80);
 
@@ -118,9 +118,9 @@ export default function GamePage() {
     if (!socket || !user || !room) return;
     socket.emit("join_room", {
       roomCode: code,
-      userId:   user._id,
+      userId: user._id,
       username: user.username,
-      avatar:   user.avatar,
+      avatar: user.avatar,
     });
   }, [socket, user, room, code]);
 
@@ -131,11 +131,11 @@ export default function GamePage() {
     socket.on("players_updated", ({ players }) => setPlayers(players));
 
     socket.on("player_joined", ({ player }) => {
-      toast(`${player?.username || "Someone"} joined! 👋`, { icon:"🟢" });
+      toast(`${player?.username || "Someone"} joined! 👋`, { icon: "🟢" });
     });
 
     socket.on("player_left", ({ username }) => {
-      toast(`${username} left`, { icon:"🔴" });
+      toast(`${username} left`, { icon: "🔴" });
     });
 
     socket.on("game_started", ({ players, totalRounds, category }) => {
@@ -250,6 +250,11 @@ export default function GamePage() {
       setFinalScores(finalScores);
     });
 
+    socket.on("room_dissolved", ({ message }) => {
+      toast.error(message || "Room was dissolved automatically.");
+      navigate("/lobby");
+    });
+
     socket.on("error", ({ message }) => {
       toast.error(message);
     });
@@ -273,6 +278,7 @@ export default function GamePage() {
       socket.off("couples_answerer_ready");
       socket.off("couples_round_revealed");
       socket.off("game_over");
+      socket.off("room_dissolved");
       socket.off("error");
     };
   }, [socket, startTimer, stopTimer]);
@@ -293,10 +299,10 @@ export default function GamePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background:"#0a0612" }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0a0612" }}>
         <div className="text-center">
           <div className="text-6xl float mb-4">🎨</div>
-          <p className="font-display text-2xl" style={{ color:"#f0e0ff" }}>Loading room…</p>
+          <p className="font-display text-2xl" style={{ color: "#f0e0ff" }}>Loading room…</p>
         </div>
       </div>
     );
@@ -307,8 +313,8 @@ export default function GamePage() {
     const cat = CATEGORY_META[room?.category] || CATEGORY_META.general;
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-        style={{ background:"#0a0612" }}>
-        
+        style={{ background: "#0a0612" }}>
+
         {/* Background Particles */}
         <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
           <Particles
@@ -326,10 +332,10 @@ export default function GamePage() {
         <div className="relative z-10 w-full max-w-xl">
           <div className="p-10 rounded-3xl text-center glass-panel"
             style={{ borderColor: "rgba(255, 255, 255, 0.35)", boxShadow: "0 8px 40px rgba(255, 255, 255, 0.15)" }}>
-            
+
             <div className="text-6xl mb-2 float" style={{ filter: `drop-shadow(0 0 8px ${cat.border})` }}>🏆</div>
-            <h1 className="font-display text-4xl mb-1" style={{ color:"#f0e0ff" }}>Game Over!</h1>
-            <p className="font-body text-sm mb-8" style={{ color:"rgba(240,224,255,0.5)" }}>
+            <h1 className="font-display text-4xl mb-1" style={{ color: "#f0e0ff" }}>Game Over!</h1>
+            <p className="font-body text-sm mb-8" style={{ color: "rgba(240,224,255,0.5)" }}>
               Points saved to your account ✅
             </p>
 
@@ -344,11 +350,11 @@ export default function GamePage() {
                     border: `2.5px solid ${itemBorder}`,
                     boxShadow: `0 0 10px ${itemBorder}22`,
                   }}>
-                  <span className="text-2xl">{["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣"][i]}</span>
+                  <span className="text-2xl">{["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"][i]}</span>
                   <img
                     src={p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${p.username}`}
                     className="w-8 h-8 rounded-full" style={{ border: `2px solid ${itemBorder}` }} />
-                  <span className="flex-1 font-body font-bold text-sm text-left" style={{ color:"#f0e0ff" }}>
+                  <span className="flex-1 font-body font-bold text-sm text-left" style={{ color: "#f0e0ff" }}>
                     {p.username} {p.userId === user?._id ? "(You)" : ""}
                   </span>
                   <span className="font-display text-lg" style={{ color: itemBorder }}>
@@ -360,7 +366,7 @@ export default function GamePage() {
 
             <button onClick={() => navigate("/lobby")}
               className="btn-bounce mt-6 w-full py-3 rounded-2xl font-display text-lg cursor-pointer"
-              style={{ background:`linear-gradient(135deg, ${cat.border}, #7c4dff)`, color:"#0a0612", border:"none", fontWeight: "bold" }}>
+              style={{ background: `linear-gradient(135deg, ${cat.border}, #7c4dff)`, color: "#0a0612", border: "none", fontWeight: "bold" }}>
               Back to Lobby 🏠
             </button>
           </div>
@@ -377,7 +383,7 @@ export default function GamePage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
         style={{ background: "#0a0612" }}>
-        
+
         {/* Background Particles corresponding to Category */}
         <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
           <Particles
@@ -395,10 +401,10 @@ export default function GamePage() {
         <div className="relative z-10 w-full max-w-2xl">
           <div className="p-10 rounded-3xl text-center glass-panel"
             style={{ borderColor: "rgba(255, 255, 255, 0.35)", boxShadow: "0 8px 40px rgba(255, 255, 255, 0.15)" }}>
-            
+
             <div className="text-5xl float mb-3" style={{ filter: `drop-shadow(0 0 8px ${cat.border})` }}>🎪</div>
             <h1 className="font-display text-3xl mb-1" style={{ color: "#f0e0ff" }}>Waiting Room</h1>
-            
+
             {/* Room code */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl mt-2 mb-6"
               style={{ background: "rgba(255,255,255,0.03)", border: `1.5px solid ${cat.border}33` }}>
@@ -521,10 +527,10 @@ export default function GamePage() {
         ) : (
           <Particles
             particleColors={cat.particleColors}
-            particleCount={600}
-            particleSpread={10}
+            particleCount={900}
+            particleSpread={15}
             speed={0.1}
-            particleBaseSize={70}
+            particleBaseSize={90}
             moveParticlesOnHover={true}
             alphaParticles={true}
             disableRotation={false}
@@ -541,7 +547,7 @@ export default function GamePage() {
             WebkitBackdropFilter: "blur(24px)",
             borderBottom: "1.5px solid rgba(255, 255, 255, 0.35)"
           }}>
-          
+
           <div className="flex items-center gap-3">
             <span className="font-display text-xl text-glow-soft" style={{ color: "#f0e0ff" }}>🎨 Playlio</span>
             <span className="font-body text-xs px-3 py-0.5 rounded-full font-bold"
@@ -572,7 +578,7 @@ export default function GamePage() {
               <div className="flex gap-1.5 items-center justify-center">
                 {maskedWord.split("").map((ch, i) => (
                   <span key={i} className={`font-display text-xl ${ch === "_" ? "border-b-2" : ""}`}
-                    style={{ borderColor: "#f0e0ff", minWidth:"12px", textAlign:"center", color: "#f0e0ff" }}>
+                    style={{ borderColor: "#f0e0ff", minWidth: "12px", textAlign: "center", color: "#f0e0ff" }}>
                     {ch === "_" ? "\u00A0" : ch}
                   </span>
                 ))}
@@ -627,7 +633,7 @@ export default function GamePage() {
 
         {/* Main game area */}
         <div className="flex flex-1 gap-3 p-3 min-h-0">
-          
+
           {/* Left: players — hidden for couples mode (only 2 players, shown differently) */}
           {!isCouplesMode && (
             <div className="w-44 flex-shrink-0 overflow-y-auto">
@@ -681,13 +687,13 @@ export default function GamePage() {
           {!isMusicMode && !isCouplesMode && (
             <div className="w-56 flex-shrink-0 flex flex-col">
               <ChatBox
-                 socket={socket}
-                 roomCode={code}
-                 userId={user?._id}
-                 username={user?.username}
-                 isDrawer={isKidsMode ? false : isDrawer}
-                 theme="dark"
-                  />               
+                socket={socket}
+                roomCode={code}
+                userId={user?._id}
+                username={user?.username}
+                isDrawer={isKidsMode ? false : isDrawer}
+                theme="dark"
+              />
             </div>
           )}
 

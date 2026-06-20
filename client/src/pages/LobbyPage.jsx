@@ -9,6 +9,8 @@ import BounceCards from "../components/BounceCards";
 import Counter from "../components/Counter";
 import PixelSnow from "../components/PixelSnow";
 import PixelEmoji from "../components/PixelEmoji";
+import PixelPanel from "../components/PixelPanel";
+import Particles from "../components/Particles";
 
 const CATEGORIES = [
   { id: "general", emoji: "🎨", label: "Draw n Guess", desc: "Classic drawing game", bg: "#0a0612", border: "#6dd5a8", video: "/videos/draw-n-guess.mp4" },
@@ -100,6 +102,8 @@ export default function LobbyPage() {
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPrivate, setIsPrivate] = useState(false);
   const [autoStartWhenFull, setAutoStartWhenFull] = useState(false);
+  const [autoDissolve, setAutoDissolve] = useState(true);
+  const [autoDissolveEmpty, setAutoDissolveEmpty] = useState(true);
   const [roundDuration, setRoundDuration] = useState(80);
   const [wordDifficulty, setWordDifficulty] = useState("mixed");
   const [enableHints, setEnableHints] = useState(true);
@@ -133,6 +137,8 @@ export default function LobbyPage() {
         maxPlayers: isCouples ? 2 : maxPlayers,
         isPrivate,
         autoStartWhenFull: isCouples ? false : autoStartWhenFull,
+        autoDissolve,
+        autoDissolveEmpty,
         totalRounds: isCouples ? 10 : rounds,
         roundDuration: isDraw ? roundDuration : 80,
         wordDifficulty: isDraw ? wordDifficulty : "mixed",
@@ -168,7 +174,12 @@ export default function LobbyPage() {
     <div className="relative z-10 page-container pb-16 pt-8 flex flex-col items-center">
 
       {/* 1. WELCOME CARD */}
-      <div className="w-full glass-panel rounded-3xl p-8 mb-10 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.01] hover:shadow-[0_8px_40px_rgba(200,168,255,0.15)]">
+      <PixelPanel
+        className="w-full p-8 mb-10 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.01]"
+        style={{
+          boxShadow: "0 8px 40px rgba(200,168,255,0.15), 0 4px 40px rgba(0, 0, 0, 0.5)",
+        }}
+      >
         <p className="font-display text-3xl mb-3 text-glow-soft tracking-wider" style={{ color: "#f0e0ff" }}>
           Hey, {user?.username}! <PixelEmoji>👋</PixelEmoji>
         </p>
@@ -193,7 +204,7 @@ export default function LobbyPage() {
             ))}
           </div>
         )}
-      </div>
+      </PixelPanel>
 
       {/* 2. TAB CONTROLS */}
       <div className="flex justify-center mb-10 w-full">
@@ -217,7 +228,7 @@ export default function LobbyPage() {
 
             {/* Left Column: Categories */}
             <div className="flex flex-col w-full">
-              <h2 className="font-display text-xs mb-5 text-center tracking-[3px]" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>
+              <h2 className="font-display text-base mb-5 text-center tracking-[3px]" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>
                 ▸ PICK A CATEGORY
               </h2>
               <div className="grid grid-cols-2 gap-4 flex-1">
@@ -228,7 +239,7 @@ export default function LobbyPage() {
                     background={c.bg}
                     borderColor={category === c.id ? c.border : "rgba(255,255,255,0.12)"}
                     textColor="white"
-                    className="flex-col items-start w-full h-full"
+                    className="flex-col items-center justify-center text-center w-full h-full"
                     style={{
                       padding: "22px 18px",
                       boxShadow: category === c.id ? `0 0 24px ${c.border}55, 0 8px 32px rgba(0,0,0,0.3)` : "0 4px 16px rgba(0,0,0,0.2)",
@@ -242,16 +253,21 @@ export default function LobbyPage() {
                     {c.video && (
                       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
                         <video
+                          key={c.id}
                           src={c.video}
                           autoPlay
                           loop
                           muted
                           playsInline
+                          preload="auto"
                           style={{
                             width: "100%",
                             height: "100%",
                             objectFit: "cover",
                             opacity: 0.45,
+                            transform: "translate3d(0,0,0)",
+                            backfaceVisibility: "hidden",
+                            willChange: "transform",
                           }}
                         />
                       </div>
@@ -274,10 +290,10 @@ export default function LobbyPage() {
                         />
                       </div>
                     )}
-                    <div className="font-display text-xs mb-2" style={{ color: c.border, lineHeight: 1.6, position: "relative", zIndex: 1 }}>
+                    <div className="font-display text-lg mb-2 text-center" style={{ color: c.border, lineHeight: 1.6, position: "relative", zIndex: 1 }}>
                       <PixelEmoji>{c.emoji}</PixelEmoji> {c.label}
                     </div>
-                    <div className="font-body text-base" style={{ color: "rgba(255,255,255,0.6)", position: "relative", zIndex: 1 }}>
+                    <div className="font-body text-sm text-center" style={{ color: "rgba(255,255,255,0.6)", position: "relative", zIndex: 1 }}>
                       {c.desc}
                     </div>
                   </PixelButton>
@@ -290,7 +306,7 @@ export default function LobbyPage() {
               <h2 className="font-display text-xs mb-5 text-center tracking-[3px]" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>
                 ▸ ROOM SETTINGS
               </h2>
-              <div className="rounded-3xl p-8 flex flex-col flex-1 justify-between glass-panel">
+              <PixelPanel className="p-8 flex flex-col flex-1 justify-between">
                 <div>
                   {/* SECTION 1: GLOBAL ROOM CONFIG */}
                   <div className="mb-6">
@@ -329,6 +345,20 @@ export default function LobbyPage() {
                       checked={category === "couples" ? false : autoStartWhenFull}
                       onChange={setAutoStartWhenFull}
                       disabled={category === "couples"}
+                    />
+
+                    <Toggle
+                      label="Auto-Dissolve Game (5m)"
+                      description="Close room automatically if game is not completed under 5 minutes"
+                      checked={autoDissolve}
+                      onChange={setAutoDissolve}
+                    />
+
+                    <Toggle
+                      label="Empty Room Timeout (30m)"
+                      description="Close room automatically 30 minutes after last player leaves (allows reconnect)"
+                      checked={autoDissolveEmpty}
+                      onChange={setAutoDissolveEmpty}
                     />
                   </div>
 
@@ -603,16 +633,16 @@ export default function LobbyPage() {
                   <PixelButton
                     onClick={handleCreateRoom}
                     disabled={loading}
-                    background={loading ? "linear-gradient(135deg,#3a2050,#2a1540)" : "linear-gradient(135deg,#c878ff,#7c4dff)"}
-                    borderColor={loading ? "rgba(200,168,255,0.2)" : "#0a0612"}
+                    background={loading ? "linear-gradient(135deg, #2b2b2d, #1c1c1e)" : "linear-gradient(135deg, #444446, #0f0f11)"}
+                    borderColor={loading ? "rgba(255, 255, 255, 0.1)" : "#555557"}
                     textColor="white"
-                    className="w-full text-xs"
+                    className="w-full text-base"
                     style={{ padding: "18px" }}
                   >
                     {loading ? <>Creating… <PixelEmoji>✨</PixelEmoji></> : <>Create Room <PixelEmoji>🚀</PixelEmoji></>}
                   </PixelButton>
                 </div>
-              </div>
+              </PixelPanel>
             </div>
 
           </div>
@@ -624,7 +654,7 @@ export default function LobbyPage() {
             <h2 className="font-display text-xs mb-5 text-center tracking-[3px]" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>
               ▸ JOIN A ROOM
             </h2>
-            <div className="w-full max-w-lg p-10 rounded-3xl glass-panel">
+            <PixelPanel className="w-full max-w-lg p-10">
               <p className="font-body text-base mb-8 text-center" style={{ color: "rgba(200,168,255,0.45)" }}>
                 Got a code from a friend? Enter it below.
               </p>
@@ -635,7 +665,8 @@ export default function LobbyPage() {
                 value={joinCode}
                 onChange={e => setJoinCode(e.target.value.toUpperCase())}
                 onKeyDown={e => e.key === "Enter" && handleJoinRoom()}
-                className="w-full px-4 py-5 font-display text-2xl text-center mb-8 cursor-target"
+                autoComplete="off"
+                className="w-full px-4 py-8 font-display text-2xl text-center mb-8 cursor-target"
                 style={{
                   background: "rgba(200,168,255,0.05)",
                   border: "1px solid rgba(200,168,255,0.2)",
@@ -648,12 +679,12 @@ export default function LobbyPage() {
                 background="linear-gradient(135deg,#84c8ff,#4d80ff)"
                 borderColor="#0a0612"
                 textColor="white"
-                className="w-full text-xs"
+                className="w-full text-base"
                 style={{ padding: "18px" }}
               >
                 Let's Go! <PixelEmoji>🎮</PixelEmoji>
               </PixelButton>
-            </div>
+            </PixelPanel>
           </div>
         )}
 
@@ -676,7 +707,7 @@ export default function LobbyPage() {
             </div>
 
             {publicRooms.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 rounded-3xl glass-panel text-center">
+              <PixelPanel className="flex flex-col items-center justify-center py-24 text-center">
                 <div className="text-6xl mb-4 float"><PixelEmoji>🎪</PixelEmoji></div>
                 <p className="font-display text-xs" style={{ color: "#f0e0ff", lineHeight: 1.6 }}>
                   No rooms yet!
@@ -684,7 +715,7 @@ export default function LobbyPage() {
                 <p className="font-body text-base mt-2" style={{ color: "rgba(200,168,255,0.35)" }}>
                   Be the first — create a room above.
                 </p>
-              </div>
+              </PixelPanel>
             ) : (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
                 {publicRooms.map(room => {
@@ -696,14 +727,33 @@ export default function LobbyPage() {
                   };
                   const cc = catColors[room.category] || catColors.general;
                   return (
-                    <div key={room._id} className="rounded-2xl p-5 flex flex-col justify-between min-h-[185px]"
+                    <PixelPanel key={room._id}
+                      borderColor={`${cc.border}55`}
+                      background="#000000"
+                      className="p-4 flex flex-col justify-between min-h-[155px] relative overflow-hidden"
                       style={{
-                        background: cc.bg,
-                        border: `1px solid ${cc.border}33`,
                         backdropFilter: "blur(12px)",
                       }}>
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
+                      {/* Background Particles as per Category */}
+                      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+                        <Particles
+                          particleColors={{
+                            general: ["#6dd5a8", "#39ff88"],
+                            kids: ["#84c8ff", "#00F0FF"],
+                            couples: ["#ff99cc", "#FF007F"],
+                            music: ["#c8a8ff", "#BD00FF"],
+                          }[room.category] || ["#ffffff"]}
+                          particleCount={25}
+                          particleSpread={5}
+                          speed={0.1}
+                          particleBaseSize={35}
+                          moveParticlesOnHover={false}
+                          alphaParticles={true}
+                          disableRotation={false}
+                        />
+                      </div>
+                      <div className="relative" style={{ zIndex: 1 }}>
+                        <div className="flex items-center gap-2 mb-2">
                           <span className="font-display text-xs px-2 py-1 rounded" style={{ background: `${cc.border}22`, color: cc.border, lineHeight: 1.6 }}>
                             {room.code}
                           </span>
@@ -721,12 +771,14 @@ export default function LobbyPage() {
                         background={`linear-gradient(135deg,${cc.border}18,${cc.border}35)`}
                         borderColor={cc.border}
                         textColor={cc.border}
-                        className="w-full text-xs mt-3"
-                        style={{ padding: "10px" }}
+                        className="w-full text-xs mt-2"
+                        style={{ padding: "8px" }}
                       >
-                        Join Room <PixelEmoji>🎮</PixelEmoji>
+                        <span className="flex items-center gap-1.5 justify-center">
+                          Join Room <PixelEmoji>🎮</PixelEmoji>
+                        </span>
                       </PixelButton>
-                    </div>
+                    </PixelPanel>
                   );
                 })}
               </div>
@@ -737,175 +789,174 @@ export default function LobbyPage() {
       </div>
 
       {/* ── ABOUT / NEWS / HOW TO PLAY ── */}
-      <div className="w-full mt-20 mb-4">
-        {/* Section header divider */}
-        <div className="flex items-center gap-4 mb-10">
-          <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(200,168,255,0.25))" }} />
-          <span className="font-display text-xs tracking-[4px]" style={{ color: "rgba(200,168,255,0.4)", lineHeight: 1.6 }}>
-            ✦ DISCOVER PLAYLIO ✦
-          </span>
-          <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(200,168,255,0.25))" }} />
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6 w-full">
-
-          {/* ── ABOUT ── */}
-          <div
-            className="rounded-3xl p-8 flex flex-col gap-5 transition-transform hover:scale-[1.02]"
-            style={{
-              background: "rgba(10,6,18,0.7)",
-              border: "1.5px solid rgba(132,200,255,0.2)",
-              backdropFilter: "blur(20px)",
-              boxShadow: "0 8px 40px rgba(132,200,255,0.06)",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-3xl"><PixelEmoji>❓</PixelEmoji></span>
-              <h2 className="font-display text-sm" style={{ color: "#84c8ff", lineHeight: 1.6 }}>About</h2>
-            </div>
-            <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.65)" }}>
-              <span style={{ color: "#c8a8ff", fontWeight: 600 }}>Playlio</span> is a free online multiplayer party game platform where friends compete in fast-paced mini-games.
-            </p>
-            <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
-              Each round tests a different skill — drawing, guessing, music knowledge, or animal instincts. The player with the most points at the end wins!
-            </p>
-            <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
-              Invite your friends, pick a game mode, and let the fun begin. <PixelEmoji>🎉</PixelEmoji>
-            </p>
-            {/* Game mode chips */}
-            <div className="flex flex-wrap gap-2 mt-auto pt-2">
-              {[
-                { emoji: "🎨", label: "Draw n Guess", color: "#6dd5a8" },
-                { emoji: "🐾", label: "Animal Quiz", color: "#84c8ff" },
-                { emoji: "💕", label: "Couples", color: "#ff99cc" },
-                { emoji: "🎵", label: "Music Quiz", color: "#c8a8ff" },
-              ].map(m => (
-                <span
-                  key={m.label}
-                  className="font-body text-sm px-3 py-1 rounded-full"
-                  style={{ background: `${m.color}15`, color: m.color, border: `1px solid ${m.color}30` }}
-                >
-                  <PixelEmoji>{m.emoji}</PixelEmoji> {m.label}
-                </span>
-              ))}
-            </div>
+      {tab === "create" && (
+        <div className="w-full mt-20 mb-4">
+          {/* Section header divider */}
+          <div className="flex items-center gap-4 mb-10">
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(200,168,255,0.25))" }} />
+            <span className="font-display text-xs tracking-[4px]" style={{ color: "rgba(200,168,255,0.4)", lineHeight: 1.6 }}>
+              ✦ DISCOVER PLAYLIO ✦
+            </span>
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(200,168,255,0.25))" }} />
           </div>
 
-          {/* ── NEWS ── */}
-          <div
-            className="rounded-3xl p-8 flex flex-col gap-4 transition-transform hover:scale-[1.02]"
-            style={{
-              background: "rgba(10,6,18,0.7)",
-              border: "1.5px solid rgba(109,213,168,0.2)",
-              backdropFilter: "blur(20px)",
-              boxShadow: "0 8px 40px rgba(109,213,168,0.06)",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-3xl"><PixelEmoji>📰</PixelEmoji></span>
-              <h2 className="font-display text-sm" style={{ color: "#6dd5a8", lineHeight: 1.6 }}>News</h2>
-            </div>
+          <div className="grid lg:grid-cols-3 gap-6 w-full">
 
-            {/* News items */}
-            {[
-              {
-                date: "June 2025",
-                title: "Playlio is Live!",
-                emoji: "🎉",
-                body: "We've launched with 4 amazing game modes — Draw n Guess, Animal Quiz, Couples, and Music Quiz. Invite your friends and start playing!",
-                accent: "#6dd5a8",
-              },
-              {
-                date: "Coming soon",
-                title: "More Games",
-                emoji: "🎮",
-                body: "New game modes are being crafted. Stay tuned for exciting additions to the Playlio universe!",
-                accent: "#c8a8ff",
-              },
-              {
-                date: "Coming soon",
-                title: "Mobile Support",
-                emoji: "📱",
-                body: "A fully responsive mobile experience is on the roadmap. Play on any device, anywhere.",
-                accent: "#84c8ff",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="rounded-2xl p-4 flex flex-col gap-1"
-                style={{ background: `${item.accent}08`, border: `1px solid ${item.accent}20` }}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-display text-xs" style={{ color: item.accent, lineHeight: 1.6 }}><PixelEmoji>{item.emoji}</PixelEmoji> {item.title}</span>
-                  <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.3)" }}>{item.date}</span>
+            {/* ── ABOUT ── */}
+            <PixelPanel
+              borderColor="rgba(132,200,255,0.3)"
+              background="rgba(10,6,18,0.7)"
+              className="p-8 flex flex-col gap-5 transition-transform hover:scale-[1.02]"
+              style={{
+                boxShadow: "0 8px 40px rgba(132,200,255,0.06)",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-3xl"><PixelEmoji>❓</PixelEmoji></span>
+                <h2 className="font-display text-sm" style={{ color: "#84c8ff", lineHeight: 1.6 }}>About</h2>
+              </div>
+              <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.65)" }}>
+                <span style={{ color: "#c8a8ff", fontWeight: 600 }}>Playlio</span> is a free online multiplayer party game platform where friends compete in fast-paced mini-games.
+              </p>
+              <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
+                Each round tests a different skill — drawing, guessing, music knowledge, or animal instincts. The player with the most points at the end wins!
+              </p>
+              <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
+                Invite your friends, pick a game mode, and let the fun begin. <PixelEmoji>🎉</PixelEmoji>
+              </p>
+              {/* Game mode chips */}
+              <div className="flex flex-wrap gap-2 mt-auto pt-2">
+                {[
+                  { emoji: "🎨", label: "Draw n Guess", color: "#6dd5a8" },
+                  { emoji: "🐾", label: "Animal Quiz", color: "#84c8ff" },
+                  { emoji: "💕", label: "Couples", color: "#ff99cc" },
+                  { emoji: "🎵", label: "Music Quiz", color: "#c8a8ff" },
+                ].map(m => (
+                  <span
+                    key={m.label}
+                    className="font-body text-sm px-3 py-1 rounded-full"
+                    style={{ background: `${m.color}15`, color: m.color, border: `1px solid ${m.color}30` }}
+                  >
+                    <PixelEmoji>{m.emoji}</PixelEmoji> {m.label}
+                  </span>
+                ))}
+              </div>
+            </PixelPanel>
+
+            {/* ── NEWS ── */}
+            <PixelPanel
+              borderColor="rgba(109,213,168,0.3)"
+              background="rgba(10,6,18,0.7)"
+              className="p-8 flex flex-col gap-4 transition-transform hover:scale-[1.02]"
+              style={{
+                boxShadow: "0 8px 40px rgba(109,213,168,0.06)",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-3xl"><PixelEmoji>📰</PixelEmoji></span>
+                <h2 className="font-display text-sm" style={{ color: "#6dd5a8", lineHeight: 1.6 }}>News</h2>
+              </div>
+
+              {/* News items */}
+              {[
+                {
+                  date: "June 2025",
+                  title: "Playlio is Live!",
+                  emoji: "🎉",
+                  body: "We've launched with 4 amazing game modes — Draw n Guess, Animal Quiz, Couples, and Music Quiz. Invite your friends and start playing!",
+                  accent: "#6dd5a8",
+                },
+                {
+                  date: "Coming soon",
+                  title: "More Games",
+                  emoji: "🎮",
+                  body: "New game modes are being crafted. Stay tuned for exciting additions to the Playlio universe!",
+                  accent: "#c8a8ff",
+                },
+                {
+                  date: "Coming soon",
+                  title: "Mobile Support",
+                  emoji: "📱",
+                  body: "A fully responsive mobile experience is on the roadmap. Play on any device, anywhere.",
+                  accent: "#84c8ff",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl p-4 flex flex-col gap-1"
+                  style={{ background: `${item.accent}08`, border: `1px solid ${item.accent}20` }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display text-xs" style={{ color: item.accent, lineHeight: 1.6 }}><PixelEmoji>{item.emoji}</PixelEmoji> {item.title}</span>
+                    <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.3)" }}>{item.date}</span>
+                  </div>
+                  <p className="font-body text-sm" style={{ color: "rgba(240,224,255,0.5)", lineHeight: 1.6 }}>
+                    {item.body}
+                  </p>
                 </div>
-                <p className="font-body text-sm" style={{ color: "rgba(240,224,255,0.5)", lineHeight: 1.6 }}>
-                  {item.body}
+              ))}
+            </PixelPanel>
+
+            {/* ── BEFORE YOU START (BounceCards component) ── */}
+            <PixelPanel
+              borderColor="rgba(200,168,255,0.3)"
+              background="rgba(10,6,18,0.7)"
+              className="p-8 flex flex-col justify-between transition-transform hover:scale-[1.02] relative overflow-hidden min-h-[460px]"
+              style={{
+                boxShadow: "0 8px 40px rgba(200,168,255,0.06)",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-3xl"><PixelEmoji>🏁</PixelEmoji></span>
+                <h2 className="font-display text-sm" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>Before You Start</h2>
+              </div>
+
+              {/* BounceCards Component */}
+              <div className="flex-1 flex items-center justify-center my-6">
+                <BounceCards
+                  images={[
+                    "/images/card1.png",
+                    "/images/card2.png",
+                    "/images/card3.png",
+                    "/images/card4.png"
+                  ]}
+                  captions={[
+                    "1. Draw & Guess",
+                    "2. Animal Quiz",
+                    "3. Music Quiz",
+                    "4. Couples Mode"
+                  ]}
+                  containerWidth={360}
+                  containerHeight={280}
+                  animationDelay={0.4}
+                  animationStagger={0.08}
+                  easeType="elastic.out(1, 0.75)"
+                  transformStyles={[
+                    "rotate(-8deg) translate(-100px, -6px)",
+                    "rotate(-3deg) translate(-33px, 4px)",
+                    "rotate(3deg) translate(33px, 4px)",
+                    "rotate(8deg) translate(100px, -6px)"
+                  ]}
+                  enableHover={true}
+                />
+              </div>
+
+              <div className="text-center w-full mt-2">
+                <p className="font-body text-base" style={{ color: "rgba(200,168,255,0.45)" }}>
+                  Hover over the cards to explore the steps!
                 </p>
               </div>
-            ))}
+            </PixelPanel>
+
           </div>
-
-          {/* ── BEFORE YOU START (BounceCards component) ── */}
-          <div
-            className="rounded-3xl p-8 flex flex-col justify-between transition-transform hover:scale-[1.02] relative overflow-hidden min-h-[460px]"
-            style={{
-              background: "rgba(10,6,18,0.7)",
-              border: "1.5px solid rgba(200,168,255,0.2)",
-              backdropFilter: "blur(20px)",
-              boxShadow: "0 8px 40px rgba(200,168,255,0.06)",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-3xl"><PixelEmoji>🏁</PixelEmoji></span>
-              <h2 className="font-display text-sm" style={{ color: "#c8a8ff", lineHeight: 1.6 }}>Before You Start</h2>
-            </div>
-
-            {/* BounceCards Component */}
-            <div className="flex-1 flex items-center justify-center my-6">
-              <BounceCards
-                images={[
-                  "/images/card1.png",
-                  "/images/card2.png",
-                  "/images/card3.png",
-                  "/images/card4.png"
-                ]}
-                captions={[
-                  "1. Draw & Guess",
-                  "2. Animal Quiz",
-                  "3. Music Quiz",
-                  "4. Couples Mode"
-                ]}
-                containerWidth={360}
-                containerHeight={280}
-                animationDelay={0.4}
-                animationStagger={0.08}
-                easeType="elastic.out(1, 0.75)"
-                transformStyles={[
-                  "rotate(-8deg) translate(-100px, -6px)",
-                  "rotate(-3deg) translate(-33px, 4px)",
-                  "rotate(3deg) translate(33px, 4px)",
-                  "rotate(8deg) translate(100px, -6px)"
-                ]}
-                enableHover={true}
-              />
-            </div>
-
-            <div className="text-center w-full mt-2">
-              <p className="font-body text-base" style={{ color: "rgba(200,168,255,0.45)" }}>
-                Hover over the cards to explore the steps!
-              </p>
-            </div>
-          </div>
-
         </div>
+      )}
 
-        {/* Footer */}
-        <div className="flex items-center justify-center gap-6 mt-12 mb-4">
-          <span className="font-body text-sm" style={{ color: "rgba(200,168,255,0.25)" }}>
-            © 2025 Playlio · Made with <PixelEmoji>💜</PixelEmoji> for gamers everywhere
-          </span>
-        </div>
+      {/* Footer */}
+      <div className="flex items-center justify-center gap-6 mt-12 mb-4">
+        <span className="font-body text-sm" style={{ color: "rgba(200,168,255,0.25)" }}>
+          © 2025 Playlio · Made with <PixelEmoji>💜</PixelEmoji> for gamers everywhere
+        </span>
       </div>
 
     </div>
