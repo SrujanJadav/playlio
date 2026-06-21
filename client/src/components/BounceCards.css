@@ -9,7 +9,7 @@
   position: absolute;
   width: 190px;
   background: #fbf9f5; /* Polaroid off-white/cream */
-  padding: 10px 10px 34px 10px; /* Thicker bottom padding for Polaroid frame */
+  padding: 0px 0px 42px 0px; /* Thicker bottom padding for Polaroid frame, none on sides/top */
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -37,7 +37,7 @@
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   background: #151020;
   /* Retro crisp pixels rendering */
   image-rendering: pixelated;
@@ -49,10 +49,16 @@
   font-size: 16px;
   color: #1a0f2b; /* dark ink tone */
   text-align: center;
-  margin-top: 8px;
+  margin-top: 14px;
   letter-spacing: 0.5px;
   line-height: 1.2;
   text-transform: uppercase;
   font-weight: 600;
   opacity: 0.85;
+}
+
+/* Crop/zoom out the baked-in white borders inside card1.png (Card 1) and card4.png (Card 3) */
+.card-0 .image,
+.card-2 .image {
+  transform: scale(1.16);
 }

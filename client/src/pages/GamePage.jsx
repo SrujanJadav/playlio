@@ -78,6 +78,7 @@ export default function GamePage() {
   const [musicOptions, setMusicOptions] = useState([]);
   const [musicReveal, setMusicReveal] = useState(null);     // { answer, artist, cover, audio } or null
   const [revealSeconds, setRevealSeconds] = useState(0);
+  const [musicAudio, setMusicAudio] = useState("");
 
   // Couples mode state
   const [couplesQuestion, setCouplesQuestion] = useState(null); // { genre, question, options }
@@ -193,10 +194,11 @@ export default function GamePage() {
     });
 
     // ── Music quiz mode events ──
-    socket.on("music_round_started", ({ clue, options, round, duration }) => {
+    socket.on("music_round_started", ({ clue, options, round, duration, audio }) => {
       setMusicClue(clue);
       setMusicOptions(options);
       setMusicReveal(null);
+      setMusicAudio(audio || "");
       setRound(round);
       startTimer(duration);
     });
@@ -671,6 +673,7 @@ export default function GamePage() {
                 userId={user?._id}
                 username={user?.username}
                 revealAnswer={musicReveal?.answer || null}
+                audio={musicAudio}
               />
             ) : isKidsMode ? (
               <QuizDisplay imageUrl={quizImage} seconds={seconds} />

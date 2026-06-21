@@ -6,6 +6,18 @@ import ArkanoidBackground from "../components/ArkanoidBackground";
 import FaultyTerminal from "../components/FaultyTerminal";
 import TypingMessages from "../components/TypingMessages";
 import PixelButton from "../components/PixelButton";
+import PixelPanel from "../components/PixelPanel";
+import PixelEmoji from "../components/PixelEmoji";
+
+const TITLE_LETTERS = [
+  { ch: "P", color: "#ff99cc" },
+  { ch: "l", color: "#c878ff" },
+  { ch: "a", color: "#84c8ff" },
+  { ch: "y", color: "#39ff88" },
+  { ch: "l", color: "#f0c840" },
+  { ch: "i", color: "#ff9999" },
+  { ch: "o", color: "#c8a8ff" },
+];
 
 const MODE_CARDS = [
   {
@@ -55,7 +67,7 @@ export default function LandingPage() {
     <div className="relative min-h-screen overflow-hidden" style={{ background: "#0a0612" }}>
 
       {/* ── Animated background: Arkanoid + CRT glitch overlay ── */}
-      <ArkanoidBackground opacity={1.0} />
+      <ArkanoidBackground opacity={0.8} />
       <div className="fixed inset-0" style={{ zIndex: 1, pointerEvents: "none" }}>
         <FaultyTerminal
           scale={1.8}
@@ -74,21 +86,47 @@ export default function LandingPage() {
           mouseStrength={0.3}
           pageLoadAnimation={true}
           brightness={0.5}
-          style={{ width: "100%", height: "100%", opacity: 0.9 }}
+          style={{ width: "100%", height: "100%", opacity: 0.7 }}
         />
       </div>
 
       {/* ── Hero ── */}
-      <div className="relative z-10 flex flex-col items-center text-center px-4 pt-16 md:pt-20 pb-12">
+      <div className="relative z-10 flex flex-col items-center text-center px-4 pt-12 md:pt-16 pb-12">
+
+        {/* ── BIG DANCING GAME TITLE ── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-end justify-center gap-0 cursor-default select-none mb-6 relative z-10"
+        >
+          {TITLE_LETTERS.map((l, i) => (
+            <span
+              key={i}
+              className="font-display"
+              style={{
+                color: l.color,
+                fontSize: i === 0 ? "min(16vw, 150px)" : "min(13vw, 120px)",
+                lineHeight: 1,
+                textShadow: `0 0 30px ${l.color}cc, 0 0 60px ${l.color}55`,
+                display: "inline-block",
+                animation: `float ${2.5 + (i % 3) * 0.4}s ease-in-out infinite`,
+                animationDelay: `${i * 0.09}s`,
+              }}
+            >
+              {l.ch}
+            </span>
+          ))}
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1 className="font-display text-2xl md:text-4xl lg:text-5xl mb-6"
-            style={{ color: "#f0e0ff", lineHeight: 1.6 }}>
-            Draw it.<br />Guess it.<br />Press Start.
+          <h1 className="font-display text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-8 tracking-wider"
+            style={{ color: "#f0e0ff", lineHeight: 1.4 }}>
+            DRAW IT. GUESS IT. PRESS START.
           </h1>
         </motion.div>
 
@@ -142,10 +180,10 @@ export default function LandingPage() {
             className="flex items-center gap-3 px-8 py-4 text-sm"
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
             Continue with Google
           </PixelButton>
@@ -164,19 +202,26 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-lg p-6 text-left"
-              style={{
-                background: mode.bg,
-                border: `2px solid ${mode.border}`,
-              }}
+              className="h-full"
             >
-              <div className="text-4xl mb-3">{mode.icon}</div>
-              <h3 className="font-display text-sm mb-3" style={{ color: mode.border, lineHeight: 1.6 }}>
-                {mode.title}
-              </h3>
-              <p className="font-body text-base" style={{ color: "#e0d8ec" }}>
-                {mode.desc}
-              </p>
+              <PixelPanel
+                borderColor={mode.border}
+                background={mode.bg}
+                className="p-6 text-left h-full flex flex-col justify-start relative"
+                style={{
+                  boxShadow: `0 8px 40px ${mode.border}22, 0 4px 40px rgba(0, 0, 0, 0.5)`
+                }}
+              >
+                <div className="text-4xl mb-3">
+                  <PixelEmoji>{mode.icon}</PixelEmoji>
+                </div>
+                <h3 className="font-display text-sm mb-3" style={{ color: mode.border, lineHeight: 1.6 }}>
+                  {mode.title}
+                </h3>
+                <p className="font-body text-base" style={{ color: "#e0d8ec" }}>
+                  {mode.desc}
+                </p>
+              </PixelPanel>
             </motion.div>
           ))}
         </div>
@@ -195,7 +240,9 @@ export default function LandingPage() {
             ].map(({ icon, step, label }) => (
               <div key={step} className="flex flex-col items-center gap-2 p-4 rounded-lg"
                 style={{ background: "rgba(200,165,255,0.08)", border: "2px solid #c8a8ff" }}>
-                <div className="text-3xl">{icon}</div>
+                <div className="text-3xl">
+                  <PixelEmoji>{icon}</PixelEmoji>
+                </div>
                 <div className="font-display text-xs px-2 py-1 rounded-full"
                   style={{ background: "#c8a8ff", color: "#2a1a3a" }}>
                   Step {step}
@@ -211,7 +258,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative z-10 text-center py-8 font-body text-xs"
         style={{ color: "#a890c8", opacity: 0.6 }}>
-        Made with 💜 and a lot of bad drawings
+        Made with <PixelEmoji>💜</PixelEmoji> and a lot of bad drawings
       </footer>
     </div>
   );

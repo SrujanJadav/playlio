@@ -50,76 +50,361 @@ const KIDS_QUIZ_BANK = {
 
 // Lyric-snippet + multiple-choice pairs for Music Quiz mode
 const MUSIC_BANK = [
+  // --- Bollywood ---
   {
-    clue: "\"I'm going back to ___, if it's a seven hour flight or a forty-five minute drive...\"",
-    answer: "505",
-    fakeOptions: ["From the Start", "Glimpse of Us", "Be More"],
-    audio: "/music-quiz/audio/505.mp3",
-    cover: "/music-quiz/covers/505.jpg",
+    clue: "\"Re kabira maan jaa, aaja tujhko pukaarein teri parchhaaiyaan...\"",
+    answer: "Kabira",
+    artist: "Tochi Raina, Rekha Bhardwaj",
+    fakeOptions: ["Tere Liye", "Teri Deewani", "Aankhon Mein Teri"],
+    audio: "/music-quiz/audio/kabira.mp3",
+    cover: "/music-quiz/covers/kabira.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Tere liye khud ko badal de, tere liye kuch bhi kar de...\"",
+    answer: "Tere Liye",
+    artist: "Atif Aslam, Shreya Ghoshal",
+    fakeOptions: ["Jo Tu Na Mila", "Bin Tere", "Kabira"],
+    audio: "/music-quiz/audio/tere-liye.mp3",
+    cover: "/music-quiz/covers/tere-liye.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Tera rastaa chhodoon na, tera rastaa chhodoon na...\"",
+    answer: "Tera Rastaa Chhodoon Na",
+    artist: "Amitabh Bhattacharya",
+    fakeOptions: ["Pehli Baar", "Rakhlo Tum Chupake", "Mere Nishan"],
+    audio: "/music-quiz/audio/tera-rastaa-chhodoon-na.mp3",
+    cover: "/music-quiz/covers/tera-rastaa-chhodo.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Ishq ke rang mein rang jaayein, teri deewani, teri deewani...\"",
+    answer: "Teri Deewani",
+    artist: "Kailash Kher",
+    fakeOptions: ["Mere Nishan", "Bin Tere", "Woh Lamhe Woh Baatein"],
+    audio: "/music-quiz/audio/teri-deewani.mp3",
+    cover: "/music-quiz/covers/teri-deewani.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Pehli baar tumko maine dekha, toh kuch aise hua...\"",
+    answer: "Pehli Baar",
+    artist: "Sunidhi Chauhan",
+    fakeOptions: ["Aankhon Mein Teri", "Jo Tu Na Mila", "Tere Liye"],
+    audio: "/music-quiz/audio/pehli-baar.mp3",
+    cover: "/music-quiz/covers/pehli-baar.jpg",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Jo tu na mila toh hum mar jaayenge, kisi aur ke ho na paayenge...\"",
+    answer: "Jo Tu Na Mila",
+    artist: "Asim Azhar",
+    fakeOptions: ["Bin Tere", "Woh Lamhe Woh Baatein", "Kabira"],
+    audio: "/music-quiz/audio/jo-tu-na-mila.mp3",
+    cover: "/music-quiz/covers/jo-tu-na-mila.jpg",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Tujhe kitna chahne lage hum, tere saath hi guzar jaayein...\"",
+    answer: "Tujhe Kitna Chahne Lage",
+    artist: "Arijit Singh",
+    fakeOptions: ["Tere Liye", "Teri Deewani", "Aankhon Mein Teri"],
+    audio: "/music-quiz/audio/tujhe-kitna-chahne-lage.mp3",
+    cover: "/music-quiz/covers/tujhe-kitna-chahne-lage.jpg",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Rakhlo tum chupake mujhe, apne dil ke aashiyane mein...\"",
+    answer: "Rakhlo Tum Chupake",
+    artist: "Amit Trivedi",
+    fakeOptions: ["Tera Rastaa Chhodoon Na", "Bin Tere", "Mere Nishan"],
+    audio: "/music-quiz/audio/rakhlo-tum-chupake.mp3",
+    cover: "/music-quiz/covers/rakhlo-tum-chupake.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Mere nishan mit chuke hain, tere dil ke dharatal se...\"",
+    answer: "Mere Nishan",
+    artist: "Kailash Kher",
+    fakeOptions: ["Teri Deewani", "Woh Lamhe Woh Baatein", "Tere Liye"],
+    audio: "/music-quiz/audio/mere-nishan.mp3",
+    cover: "/music-quiz/covers/mere-nishan.jpg",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Bin tere kya yaar mera, bin tere kya guzaara...\"",
+    answer: "Bin Tere",
+    artist: "Shafqat Amanat Ali",
+    fakeOptions: ["Jo Tu Na Mila", "Aankhon Mein Teri", "Rakhlo Tum Chupake"],
+    audio: "/music-quiz/audio/bin-tere.mp3",
+    cover: "/music-quiz/covers/bin-tere.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Aankhon mein teri ajab si ajab si adayein hain...\"",
+    answer: "Aankhon Mein Teri",
+    artist: "KK",
+    fakeOptions: ["Bin Tere", "Woh Lamhe Woh Baatein", "Pehli Baar"],
+    audio: "/music-quiz/audio/aankhon-mein-teri-ajab-si.mp3",
+    cover: "/music-quiz/covers/aankhon-mein-teri-ajab-si.png",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Woh lamhe woh baatein koi na jaane, kaise din raat beete...\"",
+    answer: "Woh Lamhe Woh Baatein",
+    artist: "Atif Aslam",
+    fakeOptions: ["Mere Nishan", "Teri Deewani", "Kabira"],
+    audio: "/music-quiz/audio/woh-lamhe-woh-baatein-.mp3",
+    cover: "/music-quiz/covers/woh-lamhe-woh-baatein-.png",
+    genre: "bollywood",
+    revealDuration: 15
   },
   {
     clue: "\"...meri jaan keh rahi, gaata hoon main yahaan, tu sun rahi...\"",
     answer: "Aaoge Tum Kabhi",
-    fakeOptions: ["Keep On Loving You", "Sweater Weather", "Escapism"],
+    artist: "The Local Train",
+    fakeOptions: ["Kabira", "Aankhon Mein Teri", "Bin Tere"],
     audio: "/music-quiz/audio/aaoge-tum-kabhi.mp3",
     cover: "/music-quiz/covers/aaoge-tum-kabi.jpg",
+    genre: "bollywood",
+    revealDuration: 15
+  },
+
+  // --- Rock ---
+  {
+    clue: "\"Ah-ah-ah-ah, we come from the land of the ice and snow...\"",
+    answer: "Immigrant Song",
+    artist: "Led Zeppelin",
+    fakeOptions: ["Stairway To Heaven", "November Rain", "Iris"],
+    audio: "/music-quiz/audio/immigrant.mp3",
+    cover: "/music-quiz/covers/immigrant.jpg",
+    genre: "rock",
+    revealDuration: 15
   },
   {
-    clue: "\"I could __ ____, I could __ ____, more than what you bargained for...\"",
-    answer: "Be More",
-    fakeOptions: ["505", "No Surprises", "From the Start"],
-    audio: "/music-quiz/audio/be-more.mp3",
-    cover: "/music-quiz/covers/be-more.jpg",
+    clue: "\"There's a lady who's sure all that glitters is gold...\"",
+    answer: "Stairway To Heaven",
+    artist: "Led Zeppelin",
+    fakeOptions: ["Immigrant Song", "November Rain", "The Great Gig In The Sky"],
+    audio: "/music-quiz/audio/stairway-to-heaven.mp3",
+    cover: "/music-quiz/covers/stairway-to-heaven.png",
+    genre: "rock",
+    revealDuration: 20
   },
   {
-    clue: "\"I said, ooh, I'm _______ by the lights, no, I can't sleep until I feel your touch...\"",
-    answer: "Blinding Lights",
-    fakeOptions: ["Sweater Weather", "Escapism", "Glimpse of Us"],
-    audio: "/music-quiz/audio/blinding-lights.mp3",
-    cover: "/music-quiz/covers/blinding-lights.jpg",
+    clue: "\"Nothing lasts forever, even cold November rain...\"",
+    answer: "November Rain",
+    artist: "Guns N' Roses",
+    fakeOptions: ["Stairway To Heaven", "The Great Gig In The Sky", "Hard To Explain"],
+    audio: "/music-quiz/audio/november-rain.mp3",
+    cover: "/music-quiz/covers/november-rain.jpg",
+    genre: "rock",
+    revealDuration: 20
   },
   {
-    clue: "\"I don't wanna feel how my heart is rippin', in fact, I don't wanna feel, so I stick to sippin'...\"",
-    answer: "Escapism",
-    fakeOptions: ["Be More", "Aaoge Tum Kabhi", "Keep On Loving You"],
-    audio: "/music-quiz/audio/escapism.mp3",
-    cover: "/music-quiz/covers/escapism.jpg",
+    clue: "\"And I am not frightened of dying, any time will do...\"",
+    answer: "The Great Gig In The Sky",
+    artist: "Pink Floyd",
+    fakeOptions: ["November Rain", "The Night We Met", "Hard To Explain"],
+    audio: "/music-quiz/audio/great-gig-in-the-sky.mp3",
+    cover: "/music-quiz/covers/great-gig-in-the-sky.png",
+    genre: "rock",
+    revealDuration: 20
   },
   {
-    clue: "\"But when you look at me, the only memory, is us holding hands, in the movie theater...\"",
-    answer: "From the Start",
-    fakeOptions: ["Glimpse of Us", "505", "No Surprises"],
-    audio: "/music-quiz/audio/from-the-start.mp3",
-    cover: "/music-quiz/covers/from-the-start.jpg",
+    clue: "\"And I don't want the world to see me, 'cause I don't think they'd understand...\"",
+    answer: "Iris",
+    artist: "Goo Goo Dolls",
+    fakeOptions: ["The Night We Met", "Hard To Explain", "Sweater Weather"],
+    audio: "/music-quiz/audio/iris.mp3",
+    cover: "/music-quiz/covers/iris.jpg",
+    genre: "rock",
+    revealDuration: 15
   },
   {
-    clue: "\"'Cause sometimes I look in her eyes, and that's where I find a _______ __ __...\"",
-    answer: "Glimpse of Us",
-    fakeOptions: ["From the Start", "Blinding Lights", "Be More"],
-    audio: "/music-quiz/audio/glimpse-of-us.mp3",
-    cover: "/music-quiz/covers/glimpse-of-us.jpg",
+    clue: "\"I don't know what I'm supposed to do, haunted by the ghost of you...\"",
+    answer: "The Night We Met",
+    artist: "Lord Huron",
+    fakeOptions: ["Iris", "Keep On Loving You", "The Scientist"],
+    audio: "/music-quiz/audio/the-night-we-met.mp3",
+    cover: "/music-quiz/covers/the-night-we-met.jpg",
+    genre: "rock",
+    revealDuration: 15
   },
   {
-    clue: "\"I don't wanna sleep, I just wanna ____ __ ______ ___. And I meant every word I said...\"",
+    clue: "\"Was an honest man, asked me for the phone, tried to take control...\"",
+    answer: "Hard To Explain",
+    artist: "The Strokes",
+    fakeOptions: ["505", "No Surprises", "The Night We Met"],
+    audio: "/music-quiz/audio/hard-to-explain.mp3",
+    cover: "/music-quiz/covers/hard-to-explain.png",
+    genre: "rock",
+    revealDuration: 15
+  },
+  {
+    clue: "\"I don't wanna sleep, I just wanna keep on loving you...\"",
     answer: "Keep On Loving You",
-    fakeOptions: ["Aaoge Tum Kabhi", "Sweater Weather", "505"],
+    artist: "Cigarettes After Sex",
+    fakeOptions: ["505", "No Surprises", "Sweater Weather"],
     audio: "/music-quiz/audio/keep-on-loving-you.mp3",
     cover: "/music-quiz/covers/keep-on-loving-you.jpg",
+    genre: "rock",
+    revealDuration: 15
   },
   {
-    clue: "\"A heart that's full up like a landfill, a job that slowly kills you, bruises that won't heal...\"",
+    clue: "\"I'm going back to 505, if it's a seven hour flight...\"",
+    answer: "505",
+    artist: "Arctic Monkeys",
+    fakeOptions: ["Keep On Loving You", "No Surprises", "Hard To Explain"],
+    audio: "/music-quiz/audio/505.mp3",
+    cover: "/music-quiz/covers/505.jpg",
+    genre: "rock",
+    revealDuration: 15
+  },
+  {
+    clue: "\"A heart that's full up like a landfill, a job that slowly kills you...\"",
     answer: "No Surprises",
-    fakeOptions: ["Escapism", "Be More", "Glimpse of Us"],
+    artist: "Radiohead",
+    fakeOptions: ["The Scientist", "Sweater Weather", "505"],
     audio: "/music-quiz/audio/no-surprises.mp3",
     cover: "/music-quiz/covers/no-suprises.jpg",
+    genre: "rock",
+    revealDuration: 15
   },
   {
-    clue: "\"'Cause it's too cold for you here and now, so let me hold both your hands in the holes of my _______...\"",
+    clue: "\"Come up to meet you, tell you I'm sorry, you don't know how lovely you are...\"",
+    answer: "The Scientist",
+    artist: "Coldplay",
+    fakeOptions: ["No Surprises", "Sweater Weather", "The Night We Met"],
+    audio: "/music-quiz/audio/the-scientist.mp3",
+    cover: "/music-quiz/covers/the-scientist.png",
+    genre: "rock",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Cause it's too cold for you here and now, so let me hold both your hands...\"",
     answer: "Sweater Weather",
-    fakeOptions: ["Blinding Lights", "Keep On Loving You", "Aaoge Tum Kabhi"],
+    artist: "The Neighbourhood",
+    fakeOptions: ["Keep On Loving You", "The Scientist", "Iris"],
     audio: "/music-quiz/audio/sweater-weather.mp3",
     cover: "/music-quiz/covers/sweater-weather.jpg",
+    genre: "rock",
+    revealDuration: 15
   },
+
+  // --- Pop ---
+  {
+    clue: "\"In this world, it's just us, you know it's not the same as it was...\"",
+    answer: "As It Was",
+    artist: "Harry Styles",
+    fakeOptions: ["Here With Me", "I Love You So", "Blinding Lights"],
+    audio: "/music-quiz/audio/as-it-was.mp3",
+    cover: "/music-quiz/covers/as-it-was.png",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"I follow you, deep sea baby, I follow you...\"",
+    answer: "Here With Me",
+    artist: "d4vd",
+    fakeOptions: ["As It Was", "I Love You So", "Be More"],
+    audio: "/music-quiz/audio/here-with-me.mp3",
+    cover: "/music-quiz/covers/here-with-me.png",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"I'm madly in love with you, and you're madly in love with me...\"",
+    answer: "I Love You So",
+    artist: "The Walters",
+    fakeOptions: ["Here With Me", "Beat It", "Glimpse Of Us"],
+    audio: "/music-quiz/audio/i-love-you-so.mp3",
+    cover: "/music-quiz/covers/i-love-you-so.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"They're out to get you, there's demons closing in on every side...\"",
+    answer: "Beat It",
+    artist: "Michael Jackson",
+    fakeOptions: ["Smooth Operator", "From The Start", "Blinding Lights"],
+    audio: "/music-quiz/audio/beat-it.mp3",
+    cover: "/music-quiz/covers/beat-it.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Diamond life, lover boy, we move in space with minimum waste...\"",
+    answer: "Smooth Operator",
+    artist: "Sade",
+    fakeOptions: ["Beat It", "From The Start", "Escapism"],
+    audio: "/music-quiz/audio/smooth-operator.mp3",
+    cover: "/music-quiz/covers/smooth-operator.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"But when you look at me, the only memory, is us holding hands...\"",
+    answer: "From The Start",
+    artist: "Laufey",
+    fakeOptions: ["Escapism", "Be More", "Glimpse Of Us"],
+    audio: "/music-quiz/audio/from-the-start.mp3",
+    cover: "/music-quiz/covers/from-the-start.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"I don't wanna feel how my heart is rippin', in fact, I don't wanna feel...\"",
+    answer: "Escapism",
+    artist: "RAYE",
+    fakeOptions: ["From The Start", "Be More", "Smooth Operator"],
+    audio: "/music-quiz/audio/escapism.mp3",
+    cover: "/music-quiz/covers/escapism.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"I could be more, I could be more, more than what you bargained for...\"",
+    answer: "Be More",
+    artist: "Stephen Sanchez",
+    fakeOptions: ["From The Start", "Escapism", "Glimpse Of Us"],
+    audio: "/music-quiz/audio/be-more.mp3",
+    cover: "/music-quiz/covers/be-more.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"Cause sometimes I look in her eyes, and that's where I find a glimpse of us...\"",
+    answer: "Glimpse Of Us",
+    artist: "Joji",
+    fakeOptions: ["I Love You So", "Be More", "Blinding Lights"],
+    audio: "/music-quiz/audio/glimpse-of-us.mp3",
+    cover: "/music-quiz/covers/glimpse-of-us.jpg",
+    genre: "pop",
+    revealDuration: 15
+  },
+  {
+    clue: "\"I said, ooh, I'm blinded by the lights, no, I can't sleep...\"",
+    answer: "Blinding Lights",
+    artist: "The Weeknd",
+    fakeOptions: ["As It Was", "Beat It", "Glimpse Of Us"],
+    audio: "/music-quiz/audio/blinding-lights.mp3",
+    cover: "/music-quiz/covers/blinding-lights.jpg",
+    genre: "pop",
+    revealDuration: 15
+  }
 ];
 
 // Questions for Couples mode — "Guess My Answer" (multi-select with partial credit)
@@ -537,12 +822,26 @@ module.exports = (io) => {
           quizAnswerTime: room.quizAnswerTime || 20,
           quizDifficulty: room.quizDifficulty || "mixed",
           couplesIntensity: room.couplesIntensity || "mixed",
+          musicAnswerTime: room.musicAnswerTime || 15,
+          musicGenre: room.musicGenre || "mixed",
           scores: {},
           guessedThisRound: new Set(),
           category: room.category,
           timer: null,
           dissolveTimer,
         };
+
+        if (room.category === "music") {
+          let filteredBank = MUSIC_BANK;
+          const genre = room.musicGenre || "mixed";
+          if (genre !== "mixed") {
+            filteredBank = MUSIC_BANK.filter((song) => song.genre === genre);
+          }
+          if (filteredBank.length === 0) {
+            filteredBank = MUSIC_BANK;
+          }
+          activeGames[roomCode].musicBank = filteredBank;
+        }
 
         // Give everyone in room their initial 0 points
         room.players.forEach((p) => {
@@ -1008,15 +1307,18 @@ module.exports = (io) => {
 
     game.guessedThisRound = new Set();
 
-    // Pick a random song, avoid repeating the same one back-to-back
+    // Pick a random song from the filtered bank, avoid repeating the same one back-to-back
     let song;
+    const bank = game.musicBank || MUSIC_BANK;
     do {
-      song = MUSIC_BANK[Math.floor(Math.random() * MUSIC_BANK.length)];
-    } while (MUSIC_BANK.length > 1 && song.answer === game.currentWord);
+      song = bank[Math.floor(Math.random() * bank.length)];
+    } while (bank.length > 1 && song.answer === game.currentWord);
 
     game.currentWord = song.answer;
     game.currentSong = song;
-    game.roundEndTime = Date.now() + MUSIC_ROUND_DURATION * 1000;
+
+    const duration = game.musicAnswerTime || 15;
+    game.roundEndTime = Date.now() + duration * 1000;
     game.guessRank = 0;
 
     // Build shuffled options (correct answer + 3 fakes)
@@ -1026,16 +1328,27 @@ module.exports = (io) => {
     room.currentRound = game.round;
     await room.save();
 
+    // Mask the correct answer in the clue lyric to avoid giving it away
+    let maskedClue = song.clue;
+    if (song.answer) {
+      const escapedAnswer = song.answer.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const regex = new RegExp(escapedAnswer, 'gi');
+      maskedClue = song.clue.replace(regex, (match) => {
+        return match.split('').map(char => char === ' ' ? ' ' : '_').join('');
+      });
+    }
+
     io.to(roomCode).emit("music_round_started", {
-      clue: song.clue,
+      clue: maskedClue,
       options,
+      audio: song.audio, // send audio URL for 3-second hint
       round: game.round,
       totalRounds: game.totalRounds,
-      duration: MUSIC_ROUND_DURATION,
+      duration: duration,
     });
 
     // Set round timer — if it runs out, reveal anyway
-    game.timer = setTimeout(() => revealMusicAnswer(io, roomCode), MUSIC_ROUND_DURATION * 1000);
+    game.timer = setTimeout(() => revealMusicAnswer(io, roomCode), duration * 1000);
   }
 
   function handleMusicGuess(io, roomCode, game, { userId, username, selected }) {
@@ -1082,6 +1395,7 @@ module.exports = (io) => {
     if (!game) return;
 
     const song = game.currentSong;
+    const revealDuration = song.revealDuration || 15;
 
     io.to(roomCode).emit("music_reveal", {
       answer: song.answer,
@@ -1090,15 +1404,15 @@ module.exports = (io) => {
       audio: song.audio,
       scores: game.scores,
       round: game.round,
-      duration: MUSIC_REVEAL_DURATION,
+      duration: revealDuration,
     });
 
     game.round++;
 
     if (game.round > game.totalRounds) {
-      setTimeout(() => endGame(io, roomCode, game), MUSIC_REVEAL_DURATION * 1000);
+      setTimeout(() => endGame(io, roomCode, game), revealDuration * 1000);
     } else {
-      setTimeout(() => startMusicRound(io, roomCode), MUSIC_REVEAL_DURATION * 1000);
+      setTimeout(() => startMusicRound(io, roomCode), revealDuration * 1000);
     }
   }
 

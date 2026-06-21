@@ -87,6 +87,8 @@ export default function BounceCards({
         const noRotationTransform = getNoRotationTransform(baseTransform);
         gsap.to(target, {
           transform: noRotationTransform,
+          scale: 1.28, // Grow larger smoothly (increased for extra pop)
+          zIndex: 10, // Bring to the very front
           duration: 0.4,
           ease: 'back.out(1.4)',
           overwrite: 'auto'
@@ -100,6 +102,8 @@ export default function BounceCards({
 
         gsap.to(target, {
           transform: pushedTransform,
+          scale: 0.94, // slightly shrink siblings to emphasize hover target
+          zIndex: i, // stack order matches index
           duration: 0.4,
           ease: 'back.out(1.4)',
           delay,
@@ -120,6 +124,8 @@ export default function BounceCards({
       const baseTransform = transformStyles[i] || 'none';
       gsap.to(target, {
         transform: baseTransform,
+        scale: 1, // return back to default scale
+        zIndex: i, // return back to standard stacking order
         duration: 0.4,
         ease: 'back.out(1.4)',
         overwrite: 'auto'

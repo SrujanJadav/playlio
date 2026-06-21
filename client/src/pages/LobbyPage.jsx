@@ -110,6 +110,8 @@ export default function LobbyPage() {
   const [quizAnswerTime, setQuizAnswerTime] = useState(20);
   const [quizDifficulty, setQuizDifficulty] = useState("mixed");
   const [couplesIntensity, setCouplesIntensity] = useState("mixed");
+  const [musicAnswerTime, setMusicAnswerTime] = useState(15);
+  const [musicGenre, setMusicGenre] = useState("mixed");
   const [joinCode, setJoinCode] = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -146,6 +148,8 @@ export default function LobbyPage() {
         quizAnswerTime: isKids ? quizAnswerTime : 20,
         quizDifficulty: isKids ? quizDifficulty : "mixed",
         couplesIntensity: isCouples ? couplesIntensity : "mixed",
+        musicAnswerTime,
+        musicGenre,
       });
       toast.success(`Room ${data.code} created! 🎉`);
       navigate(`/game/${data.code}`);
@@ -562,6 +566,77 @@ export default function LobbyPage() {
                     </div>
                   )}
 
+                  {/* SECTION 1.8: MUSIC QUIZ CONFIG (only when music mode is selected) */}
+                  {category === "music" && (
+                    <div className="mb-6">
+                      <div className="font-display text-xs tracking-wider mb-3 pb-1 border-b border-white/10" style={{ color: "rgba(200,168,255,0.8)" }}>
+                        MUSIC QUIZ OPTIONS
+                      </div>
+
+                      {/* Answer Time */}
+                      <div className="flex flex-col py-3 border-b border-white/5">
+                        <div className="flex justify-between mb-2">
+                          <span className="font-body text-base text-white/80">Answer Time</span>
+                          <span className="font-display text-xs" style={{ color: "#c8a8ff" }}>{musicAnswerTime}s</span>
+                        </div>
+                        <div className="flex gap-2">
+                          {[10, 15, 20].map(t => (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => setMusicAnswerTime(t)}
+                              className="flex-1 py-2 rounded-lg font-body text-sm border transition-all duration-200 cursor-pointer"
+                              style={{
+                                background: musicAnswerTime === t ? "rgba(200,168,255,0.12)" : "rgba(255,255,255,0.03)",
+                                borderColor: musicAnswerTime === t ? "#c8a8ff" : "rgba(255,255,255,0.12)",
+                                color: musicAnswerTime === t ? "#c8a8ff" : "rgba(255,255,255,0.6)",
+                                boxShadow: musicAnswerTime === t ? "0 0 16px rgba(200,168,255,0.3)" : "none",
+                                fontWeight: musicAnswerTime === t ? "bold" : "normal"
+                              }}
+                            >
+                              {t}s
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Genre */}
+                      <div className="flex flex-col py-3">
+                        <div className="flex justify-between mb-2">
+                          <span className="font-body text-base text-white/80">Genre</span>
+                          <span className="font-display text-xs capitalize" style={{ color: "#c8a8ff" }}>
+                            {musicGenre === "mixed" ? "Mixed" : musicGenre}
+                          </span>
+                        </div>
+                        <div className="flex rounded-lg overflow-hidden bg-black/30 border border-white/10 p-0.5 w-full font-body text-xs mb-2">
+                          {["pop", "bollywood", "rock", "mixed"].map(g => (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => setMusicGenre(g)}
+                              className="flex-1 py-2 text-center rounded transition-all duration-200 cursor-pointer capitalize"
+                              style={{
+                                background: musicGenre === g ? "rgba(200,168,255,0.15)" : "transparent",
+                                color: musicGenre === g ? "#c8a8ff" : "rgba(255,255,255,0.6)",
+                                fontWeight: musicGenre === g ? "bold" : "normal"
+                              }}
+                            >
+                              {g}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Genre Description */}
+                        <div className="font-body text-xs text-white/40 leading-relaxed bg-black/10 p-2.5 rounded border border-white/5">
+                          {musicGenre === "pop" && <><PixelEmoji>🎤</PixelEmoji> Pop: Modern pop hits, Sade, Joji, etc.</>}
+                          {musicGenre === "bollywood" && <><PixelEmoji>🎬</PixelEmoji> Bollywood: Classic & modern Hindi film songs.</>}
+                          {musicGenre === "rock" && <><PixelEmoji>🎸</PixelEmoji> Rock: Led Zeppelin, Guns N' Roses, Pink Floyd, etc.</>}
+                          {musicGenre === "mixed" && <><PixelEmoji>🎵</PixelEmoji> Mixed: Shuffled tracks from all genres.</>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* SECTION 2: DYNAMIC CATEGORY-SPECIFIC DETAILS */}
                   <div className="mt-4 rounded-2xl p-5 border" style={{
                     background: category === "general" ? "rgba(109,213,168,0.04)" :
@@ -917,8 +992,8 @@ export default function LobbyPage() {
                   images={[
                     "/images/card1.png",
                     "/images/card2.png",
-                    "/images/card3.png",
-                    "/images/card4.png"
+                    "/images/card4.png",
+                    "/images/card3.png"
                   ]}
                   captions={[
                     "1. Draw & Guess",

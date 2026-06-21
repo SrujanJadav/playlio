@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const OPTION_COLORS = [
   { bg: "rgba(255, 153, 204, 0.05)", border: "rgba(255, 153, 204, 0.4)", color: "#ff99cc" },
@@ -16,11 +16,70 @@ export default function MusicQuizDisplay({
   userId,
   username,
   revealAnswer,   // set once round ends — the correct answer string
+  audio,
 }) {
   const [selected, setSelected] = useState(null);
   const [wrongFlag, setWrongFlag] = useState(false);
 
   const timerColor = seconds <= 5 ? "#E63946" : seconds <= 10 ? "#FF9F1C" : "#06D6A0";
+
+  const [isPlayingHint, setIsPlayingHint] = useState(false);
+  const audioRef = useRef(null);
+
+  // Stop current playing hint audio if the round ends or audio changes
+  useEffect(() => {
+    if (audioRef.current) {
+      if (audioRef.current.stopTimer) {
+        clearTimeout(audioRef.current.stopTimer);
+      }
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlayingHint(false);
+  }, [audio, revealAnswer]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        if (audioRef.current.stopTimer) {
+          clearTimeout(audioRef.current.stopTimer);
+        }
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  const handlePlayHint = () => {
+    if (isPlayingHint || !audio || revealAnswer) return;
+
+    setIsPlayingHint(true);
+    const audioObj = new Audio(audio);
+    audioObj.volume = 0.5;
+    audioRef.current = audioObj;
+
+    let playPromise = audioObj.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        setIsPlayingHint(false);
+      });
+    }
+
+    const stopTimer = setTimeout(() => {
+      setIsPlayingHint(false);
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          audioObj.pause();
+          audioObj.currentTime = 0;
+        }).catch(() => {});
+      } else {
+        audioObj.pause();
+        audioObj.currentTime = 0;
+      }
+    }, 3000);
+
+    audioObj.stopTimer = stopTimer;
+  };
 
   // Reset selection state when a new round starts (clue changes)
   useEffect(() => {
@@ -93,11 +152,33 @@ export default function MusicQuizDisplay({
         🎵 Name that song!
       </div>
 
-      {/* Clue / lyric snippet */}
-      <div className="text-left w-full max-w-lg px-4 pop-in">
-        <p className="font-display text-xl md:text-2xl leading-relaxed" style={{ color:"#ffffff" }}>
-          {clue || "Loading lyric…"}
-        </p>
+      {/* Clue / lyric snippet + Play Hint Button */}
+      <div className="flex items-center gap-4 text-left w-full max-w-lg px-4 pop-in">
+        <div className="flex-1">
+          <p className="font-display text-xl md:text-2xl leading-relaxed" style={{ color:"#ffffff" }}>
+            {clue || "Loading lyric…"}
+          </p>
+        </div>
+        {audio && !revealAnswer && (
+          <button
+            onClick={handlePlayHint}
+            disabled={isPlayingHint}
+            className="btn-bounce flex items-center justify-center w-12 h-12 rounded-full border cursor-pointer transition-all duration-200"
+            style={{
+              background: isPlayingHint ? "rgba(200,168,255,0.15)" : "rgba(255,255,255,0.05)",
+              borderColor: isPlayingHint ? "#c8a8ff" : "rgba(255,255,255,0.2)",
+              color: isPlayingHint ? "#c8a8ff" : "#ffffff",
+              boxShadow: isPlayingHint ? "0 0 16px rgba(200,168,255,0.3)" : "none",
+            }}
+            title="Listen to 3s audio hint"
+          >
+            {isPlayingHint ? (
+              <span className="text-base animate-pulse">🔊</span>
+            ) : (
+              <span className="text-base">▶️</span>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Options grid */}

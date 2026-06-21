@@ -103,6 +103,15 @@ const roomSchema = new mongoose.Schema(
       enum: ["sweet", "mixed", "spicy"],
       default: "mixed",
     },
+    musicAnswerTime: {
+      type: Number,
+      default: 15,
+    },
+    musicGenre: {
+      type: String,
+      enum: ["pop", "bollywood", "rock", "mixed"],
+      default: "mixed",
+    },
   },
   { timestamps: true }
 );
