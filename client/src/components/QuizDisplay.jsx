@@ -1,4 +1,4 @@
-import wildBorder from "../pages/assets/wild-border.png";
+import wildBorder from "../pages/assets/wild-border.webp";
 
 export default function QuizDisplay({ imageUrl, seconds }) {
   const timerColor = seconds <= 5 ? "#E63946" : seconds <= 10 ? "#FF9F1C" : "rgb(6, 214, 160)";

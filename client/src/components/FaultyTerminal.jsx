@@ -163,12 +163,14 @@ vec3 getColor(vec2 p){
 
     float middle = digit(p);
     
-    const float off = 0.002;
-    float sum = digit(p + vec2(-off, -off)) + digit(p + vec2(0.0, -off)) + digit(p + vec2(off, -off)) +
-                digit(p + vec2(-off, 0.0)) + digit(p + vec2(0.0, 0.0)) + digit(p + vec2(off, 0.0)) +
-                digit(p + vec2(-off, off)) + digit(p + vec2(0.0, off)) + digit(p + vec2(off, off));
+    const float off = 0.0025;
+    float sum = middle +
+                digit(p + vec2(-off, 0.0)) +
+                digit(p + vec2(off, 0.0)) +
+                digit(p + vec2(0.0, -off)) +
+                digit(p + vec2(0.0, off));
     
-    vec3 baseColor = vec3(0.9) * middle + sum * 0.1 * vec3(1.0) * bar;
+    vec3 baseColor = vec3(0.9) * middle + (sum * 0.18) * vec3(1.0) * bar;
     return baseColor;
 }
 
@@ -235,7 +237,7 @@ export default function FaultyTerminal({
   tint = '#ffffff',
   mouseReact = true,
   mouseStrength = 0.2,
-  dpr = Math.min(window.devicePixelRatio || 1, 2),
+  dpr = 1.0,
   pageLoadAnimation = true,
   brightness = 1,
   className,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -13,10 +13,11 @@ import ChatBox from "../components/ChatBox";
 import PlayersSidebar from "../components/PlayersSidebar";
 import BackgroundMusic, { useBgm } from "../components/BackgroundMusic";
 import Silk from "../components/Silk";
-import Particles from "../components/Particles";
-import GridScan from "../components/GridScan";
-import PixelSnow from "../components/PixelSnow";
-import safariBg from "./assets/safari-bg.png";
+import safariBg from "./assets/safari-bg.webp";
+
+const Particles = lazy(() => import("../components/Particles"));
+const GridScan = lazy(() => import("../components/GridScan"));
+const PixelSnow = lazy(() => import("../components/PixelSnow"));
 
 // Round timer hook
 function useTimer(initialSeconds) {
@@ -489,55 +490,57 @@ export default function GamePage() {
 
       {/* Background corresponding to Category */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        {room?.category === "general" ? (
-          <Silk />
-        ) : room?.category === "music" ? (
-          <GridScan
-            sensitivity={0.4}
-            lineThickness={1}
-            linesColor="rgba(255, 255, 255, 0.08)"
-            gridScale={0.15}
-            scanColor="#ffffff"
-            scanOpacity={0.3}
-            enablePost={true}
-            bloomIntensity={0.5}
-            chromaticAberration={0.001}
-            noiseIntensity={0.01}
-          />
-        ) : room?.category === "couples" ? (
-          <PixelSnow
-            color="#ff99cc"
-            flakeSize={0.02}
-            minFlakeSize={1.5}
-            pixelResolution={180}
-            speed={1.5}
-            density={0.25}
-            direction={125}
-            brightness={2.0}
-            depthFade={12.0}
-            variant="heart"
-          />
-        ) : room?.category === "kids" ? (
-          <div className="absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${safariBg})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
-          />
-        ) : (
-          <Particles
-            particleColors={cat.particleColors}
-            particleCount={900}
-            particleSpread={15}
-            speed={0.1}
-            particleBaseSize={90}
-            moveParticlesOnHover={true}
-            alphaParticles={true}
-            disableRotation={false}
-          />
-        )}
+        <Suspense fallback={null}>
+          {room?.category === "general" ? (
+            <Silk />
+          ) : room?.category === "music" ? (
+            <GridScan
+              sensitivity={0.4}
+              lineThickness={1}
+              linesColor="rgba(255, 255, 255, 0.08)"
+              gridScale={0.15}
+              scanColor="#ffffff"
+              scanOpacity={0.3}
+              enablePost={true}
+              bloomIntensity={0.5}
+              chromaticAberration={0.001}
+              noiseIntensity={0.01}
+            />
+          ) : room?.category === "couples" ? (
+            <PixelSnow
+              color="#ff99cc"
+              flakeSize={0.02}
+              minFlakeSize={1.5}
+              pixelResolution={180}
+              speed={1.5}
+              density={0.25}
+              direction={125}
+              brightness={2.0}
+              depthFade={12.0}
+              variant="heart"
+            />
+          ) : room?.category === "kids" ? (
+            <div className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: `url(${safariBg})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+          ) : (
+            <Particles
+              particleColors={cat.particleColors}
+              particleCount={900}
+              particleSpread={15}
+              speed={0.1}
+              particleBaseSize={90}
+              moveParticlesOnHover={true}
+              alphaParticles={true}
+              disableRotation={false}
+            />
+          )}
+        </Suspense>
       </div>
 
       <div className="relative z-10 flex flex-col h-full">
