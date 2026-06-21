@@ -4,7 +4,13 @@ import { useAuth } from "./AuthContext";
 
 const SocketContext = createContext(null);
 
-const SOCKET_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
+let SOCKET_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
+
+// Vercel does not support WebSocket proxying on its edge network.
+// If the socket URL points to Vercel, we must connect directly to the live Render backend.
+if (SOCKET_URL.includes("vercel.app")) {
+  SOCKET_URL = "https://playlio.onrender.com";
+}
 
 export function SocketProvider({ children }) {
   const { user } = useAuth();
