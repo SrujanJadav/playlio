@@ -17,6 +17,7 @@ const roomRoutes = require("./routes/room");
 require("./middleware/passport");
 
 const app = express();
+app.set("trust proxy", 1);
 const httpServer = http.createServer(app);
 
 // Socket.io setup with CORS

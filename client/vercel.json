@@ -1,0 +1,17 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://playlio-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/socket.io/:path*",
+      "destination": "https://playlio-backend.onrender.com/socket.io/:path*"
+    },
+    {
+      "source": "/((?!assets|favicon|music-quiz).*).*",
+      "destination": "/index.html"
+    }
+  ]
+}
