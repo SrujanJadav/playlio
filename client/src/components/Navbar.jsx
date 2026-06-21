@@ -8,7 +8,7 @@ const TITLE_LETTERS = [
   { ch: "P", color: "#ff99cc" },
   { ch: "l", color: "#c878ff" },
   { ch: "a", color: "#84c8ff" },
-  { ch: "y", color: "#39ff88" },
+  { ch: "x", color: "#39ff88" },
   { ch: "l", color: "#f0c840" },
   { ch: "i", color: "#ff9999" },
   { ch: "o", color: "#c8a8ff" },

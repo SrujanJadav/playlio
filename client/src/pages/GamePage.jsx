@@ -554,7 +554,7 @@ export default function GamePage() {
           }}>
 
           <div className="flex items-center gap-3">
-            <span className="font-display text-xl text-glow-soft" style={{ color: "#f0e0ff" }}>🎨 Playlio</span>
+            <span className="font-display text-xl text-glow-soft" style={{ color: "#f0e0ff" }}>🎨 Plaxlio</span>
             <span className="font-body text-xs px-3 py-0.5 rounded-full font-bold"
               style={{ background: `${cat.border}22`, color: cat.border, border: `1.5px solid ${cat.border}44` }}>
               {cat.label}

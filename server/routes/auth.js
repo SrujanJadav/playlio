@@ -28,11 +28,11 @@ router.get("/dev-login", async (req, res) => {
     return res.status(403).send("Forbidden in production");
   }
   try {
-    let user = await User.findOne({ email: "dev@playlio.local" });
+    let user = await User.findOne({ email: "dev@plaxlio.local" });
     if (!user) {
       user = await User.create({
         username: "Developer",
-        email: "dev@playlio.local",
+        email: "dev@plaxlio.local",
         avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Developer",
         totalPoints: 1250,
         gamesPlayed: 14,

@@ -16,7 +16,7 @@ export default function LoadingScreen() {
         <div className="text-7xl float mb-4">🎨</div>
         
         <h1 className="font-display text-4xl mb-2" style={{ color:"#f0e0ff" }}>
-          Playlio
+          Plaxlio
         </h1>
         
         {/* Dot loader */}

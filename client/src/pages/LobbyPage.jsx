@@ -870,7 +870,7 @@ export default function LobbyPage() {
           <div className="flex items-center gap-4 mb-10">
             <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(200,168,255,0.25))" }} />
             <span className="font-display text-xs tracking-[4px]" style={{ color: "rgba(200,168,255,0.4)", lineHeight: 1.6 }}>
-              ✦ DISCOVER PLAYLIO ✦
+              ✦ DISCOVER PLAXLIO ✦
             </span>
             <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(200,168,255,0.25))" }} />
           </div>
@@ -891,7 +891,7 @@ export default function LobbyPage() {
                 <h2 className="font-display text-sm" style={{ color: "#84c8ff", lineHeight: 1.6 }}>About</h2>
               </div>
               <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.65)" }}>
-                <span style={{ color: "#c8a8ff", fontWeight: 600 }}>Playlio</span> is a free online multiplayer party game platform where friends compete in fast-paced mini-games.
+                <span style={{ color: "#c8a8ff", fontWeight: 600 }}>Plaxlio</span> is a free online multiplayer party game platform where friends compete in fast-paced mini-games.
               </p>
               <p className="font-body text-base leading-relaxed" style={{ color: "rgba(240,224,255,0.55)" }}>
                 Each round tests a different skill — drawing, guessing, music knowledge, or animal instincts. The player with the most points at the end wins!
@@ -936,7 +936,7 @@ export default function LobbyPage() {
               {[
                 {
                   date: "June 2025",
-                  title: "Playlio is Live!",
+                  title: "Plaxlio is Live!",
                   emoji: "🎉",
                   body: "We've launched with 4 amazing game modes — Draw n Guess, Animal Quiz, Couples, and Music Quiz. Invite your friends and start playing!",
                   accent: "#6dd5a8",
@@ -945,7 +945,7 @@ export default function LobbyPage() {
                   date: "Coming soon",
                   title: "More Games",
                   emoji: "🎮",
-                  body: "New game modes are being crafted. Stay tuned for exciting additions to the Playlio universe!",
+                  body: "New game modes are being crafted. Stay tuned for exciting additions to the Plaxlio universe!",
                   accent: "#c8a8ff",
                 },
                 {
@@ -1030,7 +1030,7 @@ export default function LobbyPage() {
       {/* Footer */}
       <div className="flex items-center justify-center gap-6 mt-12 mb-4">
         <span className="font-body text-sm" style={{ color: "rgba(200,168,255,0.25)" }}>
-          © 2025 Playlio · Made with <PixelEmoji>💜</PixelEmoji> for gamers everywhere
+          © 2025 Plaxlio · Made with <PixelEmoji>💜</PixelEmoji> for gamers everywhere
         </span>
       </div>
 
