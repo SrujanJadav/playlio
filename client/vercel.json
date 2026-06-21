@@ -10,7 +10,7 @@
       "destination": "https://playlio.onrender.com/socket.io/:path*"
     },
     {
-      "source": "/((?!assets|favicon|music-quiz).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
