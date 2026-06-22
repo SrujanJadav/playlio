@@ -48,6 +48,38 @@ router.post("/create", authMiddleware, async (req, res) => {
       ],
     });
 
+    // Auto-dissolve room if game doesn't start in 2 minutes
+    setTimeout(async () => {
+      try {
+        const currentRoom = await Room.findById(room._id);
+        if (currentRoom && currentRoom.status === "waiting") {
+          await Room.deleteOne({ _id: currentRoom._id });
+          console.log(`🧹 Waiting room ${currentRoom.code} dissolved: game did not start within 2 minutes.`);
+
+          const io = req.app.get("io");
+          if (io) {
+            io.to(currentRoom.code).emit("room_dissolved", {
+              message: "The game did not start within 2 minutes and has been automatically dissolved. ⏱️"
+            });
+
+            // Force all sockets in the room to leave
+            const roomSockets = io.sockets.adapter.rooms.get(currentRoom.code);
+            if (roomSockets) {
+              for (const socketId of roomSockets) {
+                const socket = io.sockets.sockets.get(socketId);
+                if (socket) {
+                  socket.leave(currentRoom.code);
+                  socket.data.roomCode = null;
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Waiting room auto dissolve error:", err);
+      }
+    }, 2 * 60 * 1000); // 2 minutes
+
     res.status(201).json({ room, code });
   } catch (err) {
     console.error(err);

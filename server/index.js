@@ -28,6 +28,7 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
+app.set("io", io);
 
 // Middleware
 app.use(cors({
