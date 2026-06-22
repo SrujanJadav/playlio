@@ -59,7 +59,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/kabira.mp3",
     cover: "/music-quiz/covers/kabira.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Tere liye khud ko badal de, tere liye kuch bhi kar de...\"",
@@ -69,7 +69,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/tere-liye.mp3",
     cover: "/music-quiz/covers/tere-liye.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Tera rastaa chhodoon na, tera rastaa chhodoon na...\"",
@@ -79,7 +79,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/tera-rastaa-chhodoon-na.mp3",
     cover: "/music-quiz/covers/tera-rastaa-chhodo.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Ishq ke rang mein rang jaayein, teri deewani, teri deewani...\"",
@@ -89,7 +89,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/teri-deewani.mp3",
     cover: "/music-quiz/covers/teri-deewani.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Pehli baar tumko maine dekha, toh kuch aise hua...\"",
@@ -99,7 +99,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/pehli-baar.mp3",
     cover: "/music-quiz/covers/pehli-baar.jpg",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Jo tu na mila toh hum mar jaayenge, kisi aur ke ho na paayenge...\"",
@@ -109,7 +109,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/jo-tu-na-mila.mp3",
     cover: "/music-quiz/covers/jo-tu-na-mila.jpg",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Tujhe kitna chahne lage hum, tere saath hi guzar jaayein...\"",
@@ -119,7 +119,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/tujhe-kitna-chahne-lage.mp3",
     cover: "/music-quiz/covers/tujhe-kitna-chahne-lage.jpg",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Rakhlo tum chupake mujhe, apne dil ke aashiyane mein...\"",
@@ -129,7 +129,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/rakhlo-tum-chupake.mp3",
     cover: "/music-quiz/covers/rakhlo-tum-chupake.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Mere nishan mit chuke hain, tere dil ke dharatal se...\"",
@@ -139,7 +139,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/mere-nishan.mp3",
     cover: "/music-quiz/covers/mere-nishan.jpg",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Bin tere kya yaar mera, bin tere kya guzaara...\"",
@@ -149,7 +149,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/bin-tere.mp3",
     cover: "/music-quiz/covers/bin-tere.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Aankhon mein teri ajab si ajab si adayein hain...\"",
@@ -159,7 +159,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/aankhon-mein-teri-ajab-si.mp3",
     cover: "/music-quiz/covers/aankhon-mein-teri-ajab-si.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Woh lamhe woh baatein koi na jaane, kaise din raat beete...\"",
@@ -169,7 +169,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/woh-lamhe-woh-baatein-.mp3",
     cover: "/music-quiz/covers/woh-lamhe-woh-baatein-.png",
     genre: "bollywood",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"...meri jaan keh rahi, gaata hoon main yahaan, tu sun rahi...\"",
@@ -191,7 +191,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/immigrant.mp3",
     cover: "/music-quiz/covers/immigrant.jpg",
     genre: "rock",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"There's a lady who's sure all that glitters is gold...\"",
@@ -231,7 +231,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/iris.mp3",
     cover: "/music-quiz/covers/iris.jpg",
     genre: "rock",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"I don't know what I'm supposed to do, haunted by the ghost of you...\"",
@@ -241,7 +241,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/the-night-we-met.mp3",
     cover: "/music-quiz/covers/the-night-we-met.jpg",
     genre: "rock",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Was an honest man, asked me for the phone, tried to take control...\"",
@@ -251,7 +251,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/hard-to-explain.mp3",
     cover: "/music-quiz/covers/hard-to-explain.png",
     genre: "rock",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"I don't wanna sleep, I just wanna keep on loving you...\"",
@@ -291,7 +291,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/the-scientist.mp3",
     cover: "/music-quiz/covers/the-scientist.png",
     genre: "rock",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"Cause it's too cold for you here and now, so let me hold both your hands...\"",
@@ -313,7 +313,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/as-it-was.mp3",
     cover: "/music-quiz/covers/as-it-was.png",
     genre: "pop",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"I follow you, deep sea baby, I follow you...\"",
@@ -323,7 +323,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/here-with-me.mp3",
     cover: "/music-quiz/covers/here-with-me.png",
     genre: "pop",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"I'm madly in love with you, and you're madly in love with me...\"",
@@ -333,7 +333,7 @@ const MUSIC_BANK = [
     audio: "/music-quiz/audio/i-love-you-so.mp3",
     cover: "/music-quiz/covers/i-love-you-so.jpg",
     genre: "pop",
-    revealDuration: 15
+    revealDuration: 20
   },
   {
     clue: "\"They're out to get you, there's demons closing in on every side...\"",
@@ -662,14 +662,14 @@ const COUPLES_BANK = [
 const WORD_BANKS = {
   general: {
     easy: [
-      "cat", "dog", "apple", "sun", "tree", "house", "car", "ball", "book", "fish", "hat", "cup", 
-      "door", "star", "moon", "milk", "cake", "shoe", "boat", "duck", "frog", "bird", "rain", 
+      "cat", "dog", "apple", "sun", "tree", "house", "car", "ball", "book", "fish", "hat", "cup",
+      "door", "star", "moon", "milk", "cake", "shoe", "boat", "duck", "frog", "bird", "rain",
       "snow", "chair", "table", "key", "bell", "ring", "nose", "hand", "foot", "baby", "farm"
     ],
     medium: [
-      "mountain", "ocean", "city", "forest", "desert", "volcano", "island", "bridge", "castle", 
-      "lighthouse", "submarine", "spaceship", "robot", "scientist", "chef", "astronaut", "pirate", 
-      "ninja", "superhero", "guitar", "bicycle", "octopus", "dinosaur", "sandwich", "spider", 
+      "mountain", "ocean", "city", "forest", "desert", "volcano", "island", "bridge", "castle",
+      "lighthouse", "submarine", "spaceship", "robot", "scientist", "chef", "astronaut", "pirate",
+      "ninja", "superhero", "guitar", "bicycle", "octopus", "dinosaur", "sandwich", "spider",
       "umbrella", "balloon", "butterfly", "computer", "keyboard", "microscope", "telescope"
     ],
     hard: [
@@ -955,10 +955,10 @@ module.exports = (io) => {
         }
 
         io.to(roomCode).emit("players_updated", { players: room.players });
-        io.to(roomCode).emit("player_left", { 
-          userId: targetUserId, 
+        io.to(roomCode).emit("player_left", {
+          userId: targetUserId,
           username: targetPlayer.username,
-          players: room.players 
+          players: room.players
         });
       } catch (err) {
         console.error("kick_player error:", err);
@@ -1634,17 +1634,17 @@ module.exports = (io) => {
     // Rounds 1-5 → answerer is playerOrder[0] ("him")
     // Rounds 6-10 → answerer is playerOrder[1] ("her")
     const answererId = game.round <= 5 ? game.playerOrder[0] : game.playerOrder[1];
-    const guesserId  = game.round <= 5 ? game.playerOrder[1] : game.playerOrder[0];
+    const guesserId = game.round <= 5 ? game.playerOrder[1] : game.playerOrder[0];
 
     game.currentQuestion = question;
     game.answererId = answererId;
-    game.guesserId  = guesserId;
+    game.guesserId = guesserId;
     game.answererSelections = null;
-    game.guesserSelections  = null;
+    game.guesserSelections = null;
     game.couplesPhase = "answering"; // "answering" | "guessing" | "reveal"
 
     const answererName = room.players.find(p => p.userId?.toString() === answererId)?.username;
-    const guesserName  = room.players.find(p => p.userId?.toString() === guesserId)?.username;
+    const guesserName = room.players.find(p => p.userId?.toString() === guesserId)?.username;
 
     room.currentRound = game.round;
     await room.save();
@@ -1724,8 +1724,8 @@ module.exports = (io) => {
 
     game.couplesPhase = "reveal";
 
-    const trueSet  = new Set(game.answererSelections || []);
-    const guessSet = new Set(game.guesserSelections  || []);
+    const trueSet = new Set(game.answererSelections || []);
+    const guessSet = new Set(game.guesserSelections || []);
 
     const correctMatches = [...guessSet].filter(g => trueSet.has(g)).length;
     const wrongSelections = [...guessSet].filter(g => !trueSet.has(g)).length;
