@@ -17,6 +17,7 @@ export default function MusicQuizDisplay({
   username,
   revealAnswer,   // set once round ends — the correct answer string
   audio,
+  isSpectator,
 }) {
   const [selected, setSelected] = useState(null);
   const [wrongFlag, setWrongFlag] = useState(false);
@@ -98,7 +99,7 @@ export default function MusicQuizDisplay({
   }, [socket]);
 
   const handlePick = (option) => {
-    if (selected || revealAnswer) return; // already answered or round over
+    if (selected || revealAnswer || isSpectator) return; // already answered, round over, or spectator
     setSelected(option);
     socket?.emit("music_answer", { roomCode, userId, username, selected: option });
   };
@@ -123,6 +124,9 @@ export default function MusicQuizDisplay({
     }
     if (selected) {
       return { bg: "transparent", border: colors.border, color: colors.color, opacity: 0.5 };
+    }
+    if (isSpectator) {
+      return { bg: "transparent", border: colors.border, color: colors.color, opacity: 0.4 };
     }
     return { bg: "transparent", border: colors.border, color: colors.color, opacity: 1 };
   };
@@ -190,14 +194,14 @@ export default function MusicQuizDisplay({
               <button
                 key={option}
                 onClick={() => handlePick(option)}
-                disabled={!!selected || !!revealAnswer}
+                disabled={!!selected || !!revealAnswer || isSpectator}
                 className="btn-bounce px-4 py-3 rounded-2xl font-body font-700 text-sm text-center"
                 style={{
                   background: style.bg,
                   border: `2.5px solid ${style.border}`,
                   color: style.color || "rgba(255, 255, 255, 0.9)",
                   opacity: style.opacity,
-                  cursor: (selected || revealAnswer) ? "default" : "pointer",
+                  cursor: (selected || revealAnswer || isSpectator) ? "default" : "pointer",
                 }}>
                 {option}
                 {revealAnswer && option === revealAnswer && " ✅"}
@@ -212,6 +216,12 @@ export default function MusicQuizDisplay({
       {selected && !revealAnswer && (
         <p className="font-body text-sm" style={{ color:"#d8c8f0" }}>
           {wrongFlag ? "Not quite — wait for the reveal! 👀" : "Answer locked in! Waiting for others… ⏳"}
+        </p>
+      )}
+
+      {isSpectator && !revealAnswer && (
+        <p className="font-body text-sm text-[#ffd700] bg-[#ffd700]/10 px-4 py-1.5 rounded-full border border-[#ffd700]/20 animate-pulse">
+          👁️ Spectating — You will join next round!
         </p>
       )}
     </div>

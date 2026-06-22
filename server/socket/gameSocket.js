@@ -715,7 +715,45 @@ module.exports = (io) => {
         }
 
         if (room.status === "playing") {
-          socket.emit("error", { message: "Game already in progress" });
+          if (!room.allowLateJoin) {
+            socket.emit("error", { message: "Game already in progress" });
+            return;
+          }
+          // Join as spectator
+          socket.join(roomCode);
+          socket.data.roomCode = roomCode;
+          socket.data.userId = userId;
+          socket.data.username = username;
+
+          const existingIndex = room.players.findIndex(
+            (p) => p.userId?.toString() === userId
+          );
+
+          if (existingIndex !== -1) {
+            room.players[existingIndex].socketId = socket.id;
+          } else {
+            room.players.push({
+              userId,
+              username,
+              avatar,
+              points: 0,
+              socketId: socket.id,
+              isSpectator: true,
+            });
+          }
+
+          await room.save();
+
+          if (activeGames[roomCode]) {
+            activeGames[roomCode].scores[userId] = 0;
+          }
+
+          socket.emit("room_joined", { room });
+          socket.to(roomCode).emit("player_joined", {
+            player: { userId, username, avatar, points: 0, isSpectator: true },
+            players: room.players,
+          });
+          io.to(roomCode).emit("players_updated", { players: room.players });
           return;
         }
 
@@ -879,6 +917,78 @@ module.exports = (io) => {
       }
     });
 
+    // ─── KICK PLAYER ──────────────────────────────────────────────
+    socket.on("kick_player", async ({ roomCode, targetUserId }) => {
+      try {
+        const room = await Room.findOne({ code: roomCode });
+        if (!room) return;
+
+        if (room.host.toString() !== socket.data.userId) {
+          socket.emit("error", { message: "Only the host can kick players" });
+          return;
+        }
+
+        if (room.status !== "waiting") {
+          socket.emit("error", { message: "Cannot kick players after the game has started" });
+          return;
+        }
+
+        if (room.allowKick === false) {
+          socket.emit("error", { message: "Kicking is disabled in this room" });
+          return;
+        }
+
+        const targetPlayer = room.players.find(p => p.userId?.toString() === targetUserId);
+        if (!targetPlayer) return;
+
+        const targetSocketId = targetPlayer.socketId;
+        room.players = room.players.filter(p => p.userId?.toString() !== targetUserId);
+        await room.save();
+
+        if (targetSocketId) {
+          const targetSocket = io.sockets.sockets.get(targetSocketId);
+          if (targetSocket) {
+            targetSocket.emit("kicked_from_room", { message: "You have been kicked by the host." });
+            targetSocket.leave(roomCode);
+            targetSocket.data.roomCode = null;
+          }
+        }
+
+        io.to(roomCode).emit("players_updated", { players: room.players });
+        io.to(roomCode).emit("player_left", { 
+          userId: targetUserId, 
+          username: targetPlayer.username,
+          players: room.players 
+        });
+      } catch (err) {
+        console.error("kick_player error:", err);
+      }
+    });
+
+    // ─── UPDATE ROOM SETTINGS ──────────────────────────────────────
+    socket.on("update_room_settings", async ({ roomCode, allowKick, allowLateJoin }) => {
+      try {
+        const room = await Room.findOne({ code: roomCode });
+        if (!room) return;
+
+        if (room.host.toString() !== socket.data.userId) {
+          socket.emit("error", { message: "Only the host can modify settings" });
+          return;
+        }
+
+        if (allowKick !== undefined) room.allowKick = allowKick;
+        if (allowLateJoin !== undefined) room.allowLateJoin = allowLateJoin;
+        await room.save();
+
+        io.to(roomCode).emit("room_settings_updated", {
+          allowKick: room.allowKick,
+          allowLateJoin: room.allowLateJoin,
+        });
+      } catch (err) {
+        console.error("update_room_settings error:", err);
+      }
+    });
+
     // ─── DRAWING EVENTS ──────────────────────────────────────────
     socket.on("draw", ({ roomCode, drawData }) => {
       // Broadcast drawing to everyone EXCEPT the sender
@@ -895,6 +1005,16 @@ module.exports = (io) => {
 
       if (!game) {
         // Not in a game, just a lobby chat
+        io.to(roomCode).emit("chat_message", { username, message, type: "chat" });
+        return;
+      }
+
+      // Check if user is spectator
+      const room = await Room.findOne({ code: roomCode });
+      const isSpectator = room?.players?.find(p => p.userId?.toString() === userId)?.isSpectator;
+
+      if (isSpectator) {
+        // Spectator chat message — just broadcast and return
         io.to(roomCode).emit("chat_message", { username, message, type: "chat" });
         return;
       }
@@ -966,17 +1086,25 @@ module.exports = (io) => {
     });
 
     // ─── MUSIC QUIZ: multiple-choice answer click ─────────────────
-    socket.on("music_answer", ({ roomCode, userId, username, selected }) => {
+    socket.on("music_answer", async ({ roomCode, userId, username, selected }) => {
       const game = activeGames[roomCode];
       if (!game || game.category !== "music") return;
+
+      const room = await Room.findOne({ code: roomCode });
+      const isSpectator = room?.players?.find(p => p.userId?.toString() === userId)?.isSpectator;
+      if (isSpectator) return;
 
       handleMusicGuess(io, roomCode, game, { userId, username, selected });
     });
 
     // ─── COUPLES MODE: answerer or guesser submits selections ─────
-    socket.on("couples_submit", ({ roomCode, userId, selections }) => {
+    socket.on("couples_submit", async ({ roomCode, userId, selections }) => {
       const game = activeGames[roomCode];
       if (!game || game.category !== "couples") return;
+
+      const room = await Room.findOne({ code: roomCode });
+      const isSpectator = room?.players?.find(p => p.userId?.toString() === userId)?.isSpectator;
+      if (isSpectator) return;
 
       handleCouplesSubmit(io, roomCode, game, { userId, selections });
     });
@@ -1028,9 +1156,43 @@ module.exports = (io) => {
 
   // ─── ROUND LOGIC ─────────────────────────────────────────────────
 
+  async function promoteSpectators(roomCode) {
+    try {
+      const room = await Room.findOne({ code: roomCode });
+      if (!room) return null;
+
+      let playerOrder = [];
+      let changed = false;
+
+      room.players.forEach((p) => {
+        if (p.isSpectator) {
+          p.isSpectator = false;
+          changed = true;
+        }
+        playerOrder.push(p.userId.toString());
+      });
+
+      if (changed) {
+        await room.save();
+        io.to(roomCode).emit("players_updated", { players: room.players });
+      }
+
+      const game = activeGames[roomCode];
+      if (game) {
+        game.playerOrder = playerOrder;
+      }
+      return playerOrder;
+    } catch (err) {
+      console.error("promoteSpectators error:", err);
+      return null;
+    }
+  }
+
   async function startNewRound(io, roomCode) {
     const game = activeGames[roomCode];
     if (!game) return;
+
+    await promoteSpectators(roomCode);
 
     const room = await Room.findOne({ code: roomCode });
     if (!room) return;
@@ -1183,6 +1345,8 @@ module.exports = (io) => {
     const game = activeGames[roomCode];
     if (!game) return;
 
+    await promoteSpectators(roomCode);
+
     const room = await Room.findOne({ code: roomCode });
     if (!room) return;
 
@@ -1301,6 +1465,8 @@ module.exports = (io) => {
   async function startMusicRound(io, roomCode) {
     const game = activeGames[roomCode];
     if (!game) return;
+
+    await promoteSpectators(roomCode);
 
     const room = await Room.findOne({ code: roomCode });
     if (!room) return;
@@ -1456,6 +1622,8 @@ module.exports = (io) => {
   async function startCouplesRound(io, roomCode) {
     const game = activeGames[roomCode];
     if (!game) return;
+
+    await promoteSpectators(roomCode);
 
     const room = await Room.findOne({ code: roomCode });
     if (!room) return;

@@ -1,0 +1,79 @@
+.pixel-speaker-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 48px;
+  height: 48px;
+  z-index: 9999;
+  cursor: pointer;
+  background: rgba(10, 6, 18, 0.7);
+  border: 2px solid rgba(132, 200, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 4px; /* Crisp semi-square card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease;
+  image-rendering: pixelated;
+}
+
+/* Hover Effect: scale 1.1 + blue soft glow */
+.pixel-speaker-btn:hover {
+  transform: scale(1.1);
+  border-color: rgba(132, 200, 255, 0.8);
+  box-shadow: 0 0 12px rgba(100, 200, 255, 0.4), 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Click/Active Effect: scale 0.92 button press */
+.pixel-speaker-btn:active {
+  transform: scale(0.92);
+}
+
+.pixel-speaker-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pixel-speaker-svg {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ─── Wave Morphing Animations ─── */
+.wave-group {
+  transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+}
+
+/* Wave 1 (Inner): scales down to its center (9.5px, 8.5px) and fades */
+.wave-group-1 {
+  transform-origin: 9.5px 8.5px;
+}
+.muted .wave-group-1 {
+  transform: scale(0);
+  opacity: 0;
+}
+
+/* Wave 2 (Middle / X-Bar 1): rotates 45deg around center (11.5px, 8.5px) */
+.wave-group-2 {
+  transform-origin: 11.5px 8.5px;
+}
+.muted .wave-group-2 {
+  transform: translate(0.5px, 0px) rotate(45deg);
+}
+
+/* Wave 3 (Outer / X-Bar 2): offset to the right by default (+2px), stretches vertically */
+/* When muted, it translates back to center (11.5px) and rotates -45deg to complete the X */
+.wave-group-3 {
+  transform-origin: 11.5px 8.5px;
+  transform: translate(2px, 0px) scaleY(1.3) translateY(-1px);
+}
+.muted .wave-group-3 {
+  transform: translate(0.5px, 0px) rotate(-45deg);
+}

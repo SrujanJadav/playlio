@@ -42,7 +42,7 @@ export default function PlayersSidebar({ players, currentDrawerId, scores }) {
               }}>
               
               <span className="text-base w-5 text-center">
-                {isDrawer ? "✏️" : (medals[i] ?? "👤")}
+                {isDrawer ? "✏️" : p.isSpectator ? "👁️" : (medals[i] ?? "👤")}
               </span>
               
               <img
@@ -54,6 +54,11 @@ export default function PlayersSidebar({ players, currentDrawerId, scores }) {
               <span className="flex-1 font-body text-sm font-bold truncate"
                 style={{ color:"#f0e0ff", textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
                 {p.username}
+                {p.isSpectator && (
+                  <span className="text-[10px] font-normal opacity-50 block lg:inline-block lg:ml-1">
+                    (Spectating)
+                  </span>
+                )}
               </span>
               
               <span className="font-display text-sm font-bold text-glow-soft"

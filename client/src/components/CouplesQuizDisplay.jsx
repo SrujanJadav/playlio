@@ -19,6 +19,7 @@ export default function CouplesQuizDisplay({
   guesserName,
   seconds,
   revealData,     // { answererSelections, guesserSelections, pointsEarned, guesserId } or null
+  isSpectator,
 }) {
   const [selections, setSelections] = useState([]);
   const [submitted,  setSubmitted]  = useState(false);
@@ -119,7 +120,7 @@ export default function CouplesQuizDisplay({
 
   // ── ANSWERING / GUESSING PHASES ──────────────────────────────
   const activePlayerId = phase === "answering" ? answererId : guesserId;
-  const isMyTurn = userId === activePlayerId;
+  const isMyTurn = userId === activePlayerId && !isSpectator;
 
   return (
     <div className="relative flex-1 rounded-2xl overflow-hidden flex flex-col items-center justify-center gap-5 p-6"
@@ -218,6 +219,12 @@ export default function CouplesQuizDisplay({
       {isMyTurn && submitted && (
         <p className="font-body text-sm" style={{ color: "rgba(240, 224, 255, 0.7)" }}>
           Locked in! Waiting… ⏳
+        </p>
+      )}
+
+      {isSpectator && (
+        <p className="font-body text-sm text-[#ffd700] bg-[#ffd700]/10 px-4 py-1.5 rounded-full border border-[#ffd700]/20 animate-pulse">
+          👁️ Spectating — You will join next round!
         </p>
       )}
     </div>

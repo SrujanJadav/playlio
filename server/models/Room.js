@@ -64,6 +64,14 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    allowKick: {
+      type: Boolean,
+      default: true,
+    },
+    allowLateJoin: {
+      type: Boolean,
+      default: true,
+    },
     autoStartWhenFull: {
       type: Boolean,
       default: false,

@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
+import { AudioProvider } from "./context/AudioContext";
+import PixelSpeaker from "./components/PixelSpeaker";
 
 import LandingPage     from "./pages/LandingPage";
 import LobbyLayout     from "./layouts/LobbyLayout";
@@ -44,10 +46,13 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <AppRoutes />
-      </SocketProvider>
-    </AuthProvider>
+    <AudioProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <PixelSpeaker />
+          <AppRoutes />
+        </SocketProvider>
+      </AuthProvider>
+    </AudioProvider>
   );
 }

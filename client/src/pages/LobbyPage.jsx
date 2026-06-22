@@ -101,6 +101,8 @@ export default function LobbyPage() {
   const [rounds, setRounds] = useState(5);
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [allowKick, setAllowKick] = useState(true);
+  const [allowLateJoin, setAllowLateJoin] = useState(true);
   const [autoStartWhenFull, setAutoStartWhenFull] = useState(false);
   const [autoDissolve, setAutoDissolve] = useState(true);
   const [autoDissolveEmpty, setAutoDissolveEmpty] = useState(true);
@@ -138,6 +140,8 @@ export default function LobbyPage() {
         category,
         maxPlayers: isCouples ? 2 : maxPlayers,
         isPrivate,
+        allowKick,
+        allowLateJoin,
         autoStartWhenFull: isCouples ? false : autoStartWhenFull,
         autoDissolve,
         autoDissolveEmpty,
@@ -364,6 +368,30 @@ export default function LobbyPage() {
                       checked={autoDissolveEmpty}
                       onChange={setAutoDissolveEmpty}
                     />
+
+                    {/* Dedicated Host Privileges Area */}
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xl">👑</span>
+                        <span className="font-display text-xs tracking-wider font-bold" style={{ color: "#ffd700" }}>
+                          HOST PRIVILEGES
+                        </span>
+                      </div>
+                      
+                      <Toggle
+                        label="Kick Players"
+                        description="Allow host to remove players from waiting room"
+                        checked={allowKick}
+                        onChange={setAllowKick}
+                      />
+
+                      <Toggle
+                        label="Allow Late Join"
+                        description="Players joining after game start become spectators until next round"
+                        checked={allowLateJoin}
+                        onChange={setAllowLateJoin}
+                      />
+                    </div>
                   </div>
 
                   {/* SECTION 1.5: DRAW N GUESS CONFIG (only when general mode is selected) */}

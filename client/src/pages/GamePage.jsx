@@ -19,6 +19,32 @@ const Particles = lazy(() => import("../components/Particles"));
 const GridScan = lazy(() => import("../components/GridScan"));
 const PixelSnow = lazy(() => import("../components/PixelSnow"));
 
+const WaitingRoomToggle = ({ label, checked, onChange, disabled }) => {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-b-0 text-left">
+      <div className="flex flex-col pr-4">
+        <span className="font-body text-sm text-white/80">{label}</span>
+      </div>
+      <div
+        onClick={() => !disabled && onChange(!checked)}
+        className={`w-10 h-6 rounded-full relative transition-all duration-300 flex-shrink-0 ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+        style={{
+          background: checked ? "#ffd700" : "rgba(255,255,255,0.08)",
+          border: checked ? "1px solid #ffd700" : "1px solid rgba(255,255,255,0.15)",
+          boxShadow: checked ? "0 0 10px rgba(255,215,0,0.3)" : "none"
+        }}
+      >
+        <div
+          className="absolute top-[2px] w-4.5 h-4.5 bg-white rounded-full shadow transition-all duration-300"
+          style={{
+            left: checked ? "calc(100% - 20px)" : "2px"
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 // Round timer hook
 function useTimer(initialSeconds) {
   const [seconds, setSeconds] = useState(initialSeconds);
@@ -90,6 +116,8 @@ export default function GamePage() {
 
   const { seconds, start: startTimer, stop: stopTimer } = useTimer(80);
 
+  const currentPlayer = players.find(p => p.userId === user?._id);
+  const isSpectator = currentPlayer?.isSpectator;
   const isDrawer = currentDrawer === user?._id;
   const isKidsMode = room?.category === "kids";
   const isMusicMode = room?.category === "music";
@@ -258,6 +286,15 @@ export default function GamePage() {
       navigate("/lobby");
     });
 
+    socket.on("room_settings_updated", ({ allowKick, allowLateJoin }) => {
+      setRoom(r => r ? { ...r, allowKick, allowLateJoin } : null);
+    });
+
+    socket.on("kicked_from_room", ({ message }) => {
+      toast.error(message || "You have been kicked from the room.");
+      navigate("/lobby");
+    });
+
     socket.on("error", ({ message }) => {
       toast.error(message);
     });
@@ -282,9 +319,21 @@ export default function GamePage() {
       socket.off("couples_round_revealed");
       socket.off("game_over");
       socket.off("room_dissolved");
+      socket.off("room_settings_updated");
+      socket.off("kicked_from_room");
       socket.off("error");
     };
-  }, [socket, startTimer, stopTimer]);
+  }, [socket, startTimer, stopTimer, navigate]);
+
+  const handleKick = (targetUserId) => {
+    if (!socket) return;
+    socket.emit("kick_player", { roomCode: code, targetUserId });
+  };
+
+  const handleToggleSetting = (field, val) => {
+    if (!socket) return;
+    socket.emit("update_room_settings", { roomCode: code, [field]: val });
+  };
 
   const startGame = () => {
     if (!socket) return;
@@ -438,14 +487,58 @@ export default function GamePage() {
                   <span className="font-body font-bold text-sm flex-1 text-left" style={{ color: "#f0e0ff" }}>
                     {p.username}
                   </span>
-                  {(room?.host?._id === p.userId || room?.host === p.userId) && (
+                  {(room?.host?._id === p.userId || room?.host === p.userId) ? (
                     <span className="font-body text-xs px-2 py-0.5 rounded-full font-bold"
                       style={{ background: `${cat.border}22`, color: cat.border, border: `1px solid ${cat.border}44` }}>
                       👑 Host
                     </span>
+                  ) : (
+                    isHost && room?.allowKick !== false && (
+                      <button
+                        onClick={() => handleKick(p.userId)}
+                        className="btn-bounce text-xs px-2.5 py-1 rounded-lg font-body cursor-pointer transition-all hover:bg-red-500/20 active:scale-95"
+                        style={{
+                          background: "rgba(255, 75, 75, 0.1)",
+                          border: "1.5px solid rgba(255, 75, 75, 0.4)",
+                          color: "#ff6b6b",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Kick
+                      </button>
+                    )
                   )}
                 </div>
               ))}
+            </div>
+
+            {/* Host Privileges Section */}
+            <div className="mb-6 p-4 rounded-2xl text-left border"
+              style={{
+                background: "rgba(255, 215, 0, 0.02)",
+                borderColor: "rgba(255, 215, 0, 0.2)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.15)"
+              }}>
+              <div className="flex items-center gap-2 mb-3 pb-1.5 border-b border-white/5">
+                <span className="text-lg">👑</span>
+                <span className="font-display text-xs tracking-wider font-bold" style={{ color: "#ffd700" }}>
+                  HOST PRIVILEGES
+                </span>
+              </div>
+              
+              <WaitingRoomToggle
+                label="Kick Players"
+                checked={room?.allowKick !== false}
+                onChange={(val) => handleToggleSetting("allowKick", val)}
+                disabled={!isHost}
+              />
+
+              <WaitingRoomToggle
+                label="Allow Late Join"
+                checked={room?.allowLateJoin !== false}
+                onChange={(val) => handleToggleSetting("allowLateJoin", val)}
+                disabled={!isHost}
+              />
             </div>
 
             {players.length < 2 && (
@@ -544,6 +637,16 @@ export default function GamePage() {
       </div>
 
       <div className="relative z-10 flex flex-col h-full">
+        {/* Spectator banner */}
+        {isSpectator && (
+          <div className="bg-[#ffd700]/10 border-b border-[#ffd700]/30 px-6 py-2 flex items-center justify-between text-xs text-[#ffd700] select-none z-25">
+            <div className="flex items-center gap-2">
+              <span>👁️</span>
+              <span><strong>Spectating</strong> — You joined mid-game. You will be automatically added to the next round!</span>
+            </div>
+          </div>
+        )}
+
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-3 flex-shrink-0"
           style={{
@@ -665,6 +768,7 @@ export default function GamePage() {
                 guesserName={couplesGuesser.name}
                 seconds={seconds}
                 revealData={couplesReveal}
+                isSpectator={isSpectator}
               />
             ) : isMusicMode ? (
               <MusicQuizDisplay
@@ -677,6 +781,7 @@ export default function GamePage() {
                 username={user?.username}
                 revealAnswer={musicReveal?.answer || null}
                 audio={musicAudio}
+                isSpectator={isSpectator}
               />
             ) : isKidsMode ? (
               <QuizDisplay imageUrl={quizImage} seconds={seconds} />
