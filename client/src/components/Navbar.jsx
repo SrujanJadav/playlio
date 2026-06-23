@@ -93,46 +93,31 @@ export default function Navbar() {
         <div className="w-full px-6 h-16 flex items-center justify-between">
           
           {/* LEFT — Profile & Coins Cluster */}
-          <div className="flex items-center">
-            <div
-              className="flex items-center gap-3 px-3 py-1.5 rounded-full font-body text-sm"
-              style={{
-                background: "rgba(255, 255, 255, 0.04)",
-                border: "1px solid rgba(200, 168, 255, 0.15)",
-                boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
-              }}
-            >
-              {/* Points */}
-              <div className="flex items-center gap-1.5 text-[#f0c840]">
-                ⭐ {user?.totalPoints?.toLocaleString() ?? 0}
-              </div>
+          <div className="flex items-center gap-4 font-body text-sm">
+            {/* Points */}
+            <div className="flex items-center gap-1.5 text-[#f0c840]">
+              ⭐ {user?.totalPoints?.toLocaleString() ?? 0}
+            </div>
 
-              {/* Vertical divider */}
-              <div className="h-4 w-px bg-white/20 hidden sm:block" />
+            {/* Vertical divider */}
+            <div className="h-4 w-px bg-white/20 hidden sm:block" />
 
-              {/* Profile details */}
-              <div className="hidden sm:flex items-center gap-3">
-                <div className="relative flex-shrink-0">
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: "-1px",
-                      borderRadius: "50%",
-                      boxShadow: "0 0 8px 1px rgba(57,255,136,0.3)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                  <img
-                    src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`}
-                    alt={user?.username}
-                    className="w-7 h-7 rounded-full object-cover relative z-10"
-                    style={{ border: "1.5px solid #39ff88" }}
-                  />
-                </div>
-                <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.95)" }}>
-                  {user?.username}
-                </span>
+            {/* Profile details */}
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="relative flex-shrink-0">
+                <img
+                  src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`}
+                  alt={user?.username}
+                  className="w-7 h-7 object-cover relative z-10"
+                  style={{
+                    border: "2px solid #000000",
+                    imageRendering: "pixelated",
+                  }}
+                />
               </div>
+              <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.95)" }}>
+                {user?.username}
+              </span>
             </div>
 
             {/* Logout button for mobile */}

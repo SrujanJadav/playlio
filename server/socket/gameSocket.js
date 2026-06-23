@@ -72,7 +72,7 @@ const MUSIC_BANK = [
     revealDuration: 20
   },
   {
-    clue: "\"Tera rastaa chhodoon na, tera rastaa chhodoon na...\"",
+    clue: "\"Meethi meethi chashni boondiyan, tera rastaa chhodoon na...\"",
     answer: "Tera Rastaa Chhodoon Na",
     artist: "Amitabh Bhattacharya",
     fakeOptions: ["Pehli Baar", "Rakhlo Tum Chupake", "Mere Nishan"],
@@ -698,6 +698,11 @@ module.exports = (io) => {
   io.on("connection", (socket) => {
     console.log(`🔌 Socket connected: ${socket.id}`);
 
+    // Time synchronization ping-pong
+    socket.on("sync_time_ping", ({ sendTime }) => {
+      socket.emit("sync_time_pong", { sendTime, serverTime: Date.now() });
+    });
+
     // ─── JOIN ROOM ───────────────────────────────────────────────
     socket.on("join_room", async ({ roomCode, userId, username, avatar }) => {
       try {
@@ -1002,6 +1007,28 @@ module.exports = (io) => {
       socket.to(roomCode).emit("canvas_cleared");
     });
 
+    socket.on("select_word", async ({ roomCode, word, userId }) => {
+      try {
+        const game = activeGames[roomCode];
+        if (!game || !game.isChoosingWord) return;
+
+        const effectiveUserId = userId || socket.data.userId;
+        if (game.currentDrawerId !== effectiveUserId) {
+          console.log(`⚠️ User ${effectiveUserId} tried to select word but is not the drawer`);
+          return;
+        }
+
+        if (!game.wordOptions.includes(word)) {
+          console.log(`⚠️ User ${effectiveUserId} tried to select word "${word}" which is not in options`);
+          return;
+        }
+
+        await startDrawingPhase(io, roomCode, word);
+      } catch (err) {
+        console.error("select_word error:", err);
+      }
+    });
+
     // ─── CHAT / GUESSING ─────────────────────────────────────────
     socket.on("send_chat", async ({ roomCode, userId, username, message }) => {
       const game = activeGames[roomCode];
@@ -1018,6 +1045,12 @@ module.exports = (io) => {
 
       if (isSpectator) {
         // Spectator chat message — just broadcast and return
+        io.to(roomCode).emit("chat_message", { username, message, type: "chat" });
+        return;
+      }
+
+      if (game.isChoosingWord) {
+        // Drawer is still choosing a word, just broadcast as normal chat
         io.to(roomCode).emit("chat_message", { username, message, type: "chat" });
         return;
       }
@@ -1220,56 +1253,29 @@ module.exports = (io) => {
     }
   }
 
-  async function startNewRound(io, roomCode) {
+  async function startDrawingPhase(io, roomCode, chosenWord) {
     const game = activeGames[roomCode];
-    if (!game) return;
+    if (!game || !game.isChoosingWord) return;
+    game.isChoosingWord = false;
 
-    await promoteSpectators(roomCode);
+    // Clear the 5-second choosing timer
+    if (game.timer) clearTimeout(game.timer);
 
     const room = await Room.findOne({ code: roomCode });
     if (!room) return;
 
-    // Clear any previous hint timers
-    if (game.hintTimer1) clearTimeout(game.hintTimer1);
-    if (game.hintTimer2) clearTimeout(game.hintTimer2);
-
-    // Reset guesses for new round
-    game.guessedThisRound = new Set();
-
-    // Pick the drawer
-    const drawerId = game.playerOrder[game.currentDrawerIndex];
-    game.currentDrawerId = drawerId; // store explicitly for chat/guess checks
-    game.currentDrawerIndex = (game.currentDrawerIndex + 1) % game.playerOrder.length;
-
-    // Pick a random word from category based on difficulty settings
-    let bank = [];
-    if (game.category === "general") {
-      const difficulty = game.wordDifficulty || "mixed";
-      const gBank = WORD_BANKS.general;
-      if (difficulty === "easy") {
-        bank = gBank.easy;
-      } else if (difficulty === "medium") {
-        bank = gBank.medium;
-      } else if (difficulty === "hard") {
-        bank = gBank.hard;
-      } else {
-        bank = [...gBank.easy, ...gBank.medium, ...gBank.hard];
-      }
-    } else {
-      bank = WORD_BANKS[game.category] || WORD_BANKS.general.easy;
-    }
-
-    const word = bank[Math.floor(Math.random() * bank.length)];
+    const word = chosenWord;
     game.currentWord = word;
 
     const duration = game.roundDuration || 80;
     game.roundEndTime = Date.now() + duration * 1000;
 
     // Update room in DB
-    room.currentDrawer = drawerId;
     room.currentWord = word;
     room.currentRound = game.round;
     await room.save();
+
+    const drawerId = game.currentDrawerId;
 
     // Send word ONLY to the drawer
     const drawerSocket = findSocketByUserId(io, drawerId, roomCode);
@@ -1279,6 +1285,7 @@ module.exports = (io) => {
         round: game.round,
         totalRounds: game.totalRounds,
         duration: duration,
+        roundEndTime: game.roundEndTime,
       });
     }
 
@@ -1292,9 +1299,10 @@ module.exports = (io) => {
       wordLength: word.length,
       maskedWord,
       duration: duration,
+      roundEndTime: game.roundEndTime,
     });
 
-    // Set round timer
+    // Set round timer for drawing phase
     game.timer = setTimeout(() => endRound(io, roomCode), duration * 1000);
 
     // Schedule Hint Reveals if enabled
@@ -1344,6 +1352,95 @@ module.exports = (io) => {
     }
   }
 
+  async function startNewRound(io, roomCode) {
+    const game = activeGames[roomCode];
+    if (!game) return;
+
+    await promoteSpectators(roomCode);
+
+    const room = await Room.findOne({ code: roomCode });
+    if (!room) return;
+
+    // Clear any previous hint timers
+    if (game.hintTimer1) clearTimeout(game.hintTimer1);
+    if (game.hintTimer2) clearTimeout(game.hintTimer2);
+
+    // Reset guesses for new round
+    game.guessedThisRound = new Set();
+
+    // Pick the drawer
+    const drawerId = game.playerOrder[game.currentDrawerIndex];
+    game.currentDrawerId = drawerId; // store explicitly for chat/guess checks
+    game.currentDrawerIndex = (game.currentDrawerIndex + 1) % game.playerOrder.length;
+
+    // Pick 3 random words from category based on difficulty settings
+    let bank = [];
+    if (game.category === "general") {
+      const difficulty = game.wordDifficulty || "mixed";
+      const gBank = WORD_BANKS.general;
+      if (difficulty === "easy") {
+        bank = gBank.easy;
+      } else if (difficulty === "medium") {
+        bank = gBank.medium;
+      } else if (difficulty === "hard") {
+        bank = gBank.hard;
+      } else {
+        bank = [...gBank.easy, ...gBank.medium, ...gBank.hard];
+      }
+    } else {
+      bank = WORD_BANKS[game.category] || WORD_BANKS.general.easy;
+    }
+
+    // Pick 3 unique random words
+    const shuffled = [...bank].sort(() => 0.5 - Math.random());
+    const options = shuffled.slice(0, 3);
+
+    // Save to game state
+    game.wordOptions = options;
+    game.isChoosingWord = true;
+
+    // Update room drawer in DB
+    room.currentDrawer = drawerId;
+    room.currentWord = ""; // Clear current word in DB since they haven't chosen yet
+    room.currentRound = game.round;
+    await room.save();
+
+    const drawerName = room.players.find((p) => p.userId?.toString() === drawerId)?.username || "Someone";
+
+    // Set 5-second timer to auto-choose
+    const chooseDuration = 5;
+    game.roundEndTime = Date.now() + chooseDuration * 1000;
+
+    // Send choose_word ONLY to the drawer
+    const drawerSocket = findSocketByUserId(io, drawerId, roomCode);
+    if (drawerSocket) {
+      drawerSocket.emit("choose_word", {
+        options,
+        duration: chooseDuration,
+        round: game.round,
+        totalRounds: game.totalRounds,
+        roundEndTime: game.roundEndTime,
+      });
+    }
+
+    // Send drawer_choosing_word to everyone else
+    io.to(roomCode).emit("drawer_choosing_word", {
+      drawerId,
+      drawerName,
+      round: game.round,
+      totalRounds: game.totalRounds,
+      duration: chooseDuration,
+      roundEndTime: game.roundEndTime,
+    });
+
+    if (game.timer) clearTimeout(game.timer);
+    game.timer = setTimeout(() => {
+      // Auto-choose first word
+      const chosenWord = options[0];
+      startDrawingPhase(io, roomCode, chosenWord);
+    }, chooseDuration * 1000);
+  }
+
   async function endRound(io, roomCode) {
     const game = activeGames[roomCode];
     if (!game) return;
@@ -1362,6 +1459,9 @@ module.exports = (io) => {
       scores: game.scores,
       round: game.round,
     });
+
+    // Auto clear canvas for everyone when round ends
+    io.to(roomCode).emit("canvas_cleared");
 
     game.round++;
 
@@ -1416,6 +1516,7 @@ module.exports = (io) => {
       round: game.round,
       totalRounds: game.totalRounds,
       duration: duration,
+      roundEndTime: game.roundEndTime,
     });
 
     // Set round timer
@@ -1550,6 +1651,7 @@ module.exports = (io) => {
       round: game.round,
       totalRounds: game.totalRounds,
       duration: duration,
+      roundEndTime: game.roundEndTime,
     });
 
     // Set round timer — if it runs out, reveal anyway
@@ -1608,6 +1710,7 @@ module.exports = (io) => {
 
     const song = game.currentSong;
     const revealDuration = song.revealDuration || 15;
+    game.roundEndTime = Date.now() + revealDuration * 1000;
 
     io.to(roomCode).emit("music_reveal", {
       answer: song.answer,
@@ -1617,6 +1720,7 @@ module.exports = (io) => {
       scores: game.scores,
       round: game.round,
       duration: revealDuration,
+      roundEndTime: game.roundEndTime,
     });
 
     game.round++;
@@ -1695,6 +1799,8 @@ module.exports = (io) => {
     room.currentRound = game.round;
     await room.save();
 
+    game.roundEndTime = Date.now() + COUPLES_ANSWER_DURATION * 1000;
+
     // Tell everyone the round started — who's answering, who's guessing
     io.to(roomCode).emit("couples_round_started", {
       round: game.round,
@@ -1708,6 +1814,7 @@ module.exports = (io) => {
       guesserName,
       phase: "answering",
       duration: COUPLES_ANSWER_DURATION,
+      roundEndTime: game.roundEndTime,
     });
 
     // Timer for the answering phase
@@ -1725,9 +1832,11 @@ module.exports = (io) => {
     if (!game) return;
 
     game.couplesPhase = "guessing";
+    game.roundEndTime = Date.now() + COUPLES_GUESS_DURATION * 1000;
 
     io.to(roomCode).emit("couples_phase_guessing", {
       duration: COUPLES_GUESS_DURATION,
+      roundEndTime: game.roundEndTime,
     });
 
     game.timer = setTimeout(() => {
@@ -1789,6 +1898,8 @@ module.exports = (io) => {
     // Points go to the GUESSER
     game.scores[game.guesserId] = (game.scores[game.guesserId] || 0) + points;
 
+    game.roundEndTime = Date.now() + COUPLES_REVEAL_DURATION * 1000;
+
     io.to(roomCode).emit("couples_round_revealed", {
       round: game.round,
       question: game.currentQuestion.question,
@@ -1798,6 +1909,7 @@ module.exports = (io) => {
       pointsEarned: points,
       guesserId: game.guesserId,
       scores: game.scores,
+      roundEndTime: game.roundEndTime,
     });
 
     game.round++;

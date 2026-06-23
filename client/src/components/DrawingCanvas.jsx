@@ -15,6 +15,25 @@ export default function DrawingCanvas({ socket, roomCode, isDrawer }) {
   const [color,     setColor]     = useState("#2D2438");
   const [lineWidth, setLineWidth] = useState(6);
 
+  // Sync states to refs to avoid rebuilding callbacks
+  const colorRef = useRef(color);
+  const lineWidthRef = useRef(lineWidth);
+  const toolRef = useRef(tool);
+  const pendingLinesRef = useRef([]);
+  const flushTimerRef = useRef(null);
+
+  useEffect(() => {
+    colorRef.current = color;
+  }, [color]);
+
+  useEffect(() => {
+    lineWidthRef.current = lineWidth;
+  }, [lineWidth]);
+
+  useEffect(() => {
+    toolRef.current = tool;
+  }, [tool]);
+
   // Initialize canvas context
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,9 +56,25 @@ export default function DrawingCanvas({ socket, roomCode, isDrawer }) {
       ctx.lineWidth   = drawData.lineWidth;
       ctx.globalCompositeOperation = drawData.tool === "eraser"
         ? "destination-out" : "source-over";
+      
       ctx.beginPath();
-      ctx.moveTo(drawData.x0, drawData.y0);
-      ctx.lineTo(drawData.x1, drawData.y1);
+      if (drawData.lines && Array.isArray(drawData.lines)) {
+        if (drawData.lines.length > 0) {
+          ctx.moveTo(drawData.lines[0].x0, drawData.lines[0].y0);
+          for (let i = 0; i < drawData.lines.length; i++) {
+            const line = drawData.lines[i];
+            // If there's a gap between segments, move to the new start coordinate
+            if (i > 0 && (line.x0 !== drawData.lines[i - 1].x1 || line.y0 !== drawData.lines[i - 1].y1)) {
+              ctx.moveTo(line.x0, line.y0);
+            }
+            ctx.lineTo(line.x1, line.y1);
+          }
+        }
+      } else {
+        // Fallback for single line compatibility
+        ctx.moveTo(drawData.x0, drawData.y0);
+        ctx.lineTo(drawData.x1, drawData.y1);
+      }
       ctx.stroke();
     };
 
@@ -57,6 +92,15 @@ export default function DrawingCanvas({ socket, roomCode, isDrawer }) {
     };
   }, [socket]);
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (flushTimerRef.current) {
+        clearTimeout(flushTimerRef.current);
+      }
+    };
+  }, []);
+
   // Get canvas-relative coords
   const getPos = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -71,8 +115,10 @@ export default function DrawingCanvas({ socket, roomCode, isDrawer }) {
     };
   }, []);
 
-  const drawLine = useCallback((x0, y0, x1, y1, emit = true) => {
+  // Draw locally on canvas
+  const drawLineLocally = useCallback((x0, y0, x1, y1) => {
     const ctx = ctxRef.current;
+    if (!ctx) return;
     ctx.strokeStyle = color;
     ctx.lineWidth   = lineWidth;
     ctx.globalCompositeOperation = tool === "eraser"
@@ -81,14 +127,37 @@ export default function DrawingCanvas({ socket, roomCode, isDrawer }) {
     ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
     ctx.stroke();
+  }, [color, lineWidth, tool]);
 
-    if (emit && socket) {
+  // Flush batched lines to socket
+  const flushLines = useCallback(() => {
+    if (flushTimerRef.current) {
+      clearTimeout(flushTimerRef.current);
+      flushTimerRef.current = null;
+    }
+    if (pendingLinesRef.current.length === 0) return;
+
+    if (socket) {
       socket.emit("draw", {
         roomCode,
-        drawData: { x0, y0, x1, y1, color, lineWidth, tool },
+        drawData: {
+          lines: [...pendingLinesRef.current],
+          color: colorRef.current,
+          lineWidth: lineWidthRef.current,
+          tool: toolRef.current,
+        },
       });
     }
-  }, [color, lineWidth, tool, socket, roomCode]);
+    pendingLinesRef.current = [];
+  }, [socket, roomCode]);
+
+  // Queue segment for batch emission
+  const queueLine = useCallback((x0, y0, x1, y1) => {
+    pendingLinesRef.current.push({ x0, y0, x1, y1 });
+    if (!flushTimerRef.current) {
+      flushTimerRef.current = setTimeout(flushLines, 33); // emit approx. every ~30fps
+    }
+  }, [flushLines]);
 
   const startDraw = useCallback((e) => {
     if (!isDrawer) return;
@@ -101,13 +170,15 @@ export default function DrawingCanvas({ socket, roomCode, isDrawer }) {
     if (!drawing.current || !isDrawer) return;
     e.preventDefault();
     const pos = getPos(e);
-    drawLine(lastPos.current.x, lastPos.current.y, pos.x, pos.y);
+    drawLineLocally(lastPos.current.x, lastPos.current.y, pos.x, pos.y);
+    queueLine(lastPos.current.x, lastPos.current.y, pos.x, pos.y);
     lastPos.current = pos;
-  }, [isDrawer, getPos, drawLine]);
+  }, [isDrawer, getPos, drawLineLocally, queueLine]);
 
   const stopDraw = useCallback(() => {
     drawing.current = false;
-  }, []);
+    flushLines(); // immediate flush on stroke completion
+  }, [flushLines]);
 
   const clearCanvas = () => {
     const ctx = ctxRef.current;

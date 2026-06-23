@@ -16,6 +16,7 @@ export function SocketProvider({ children }) {
   const { user } = useAuth();
   const socketRef = useRef(null);
   const [connected, setConnected] = useState(false);
+  const [clockOffset, setClockOffset] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -38,6 +39,17 @@ export function SocketProvider({ children }) {
       socketRef.current.on("connect", () => {
         console.log("🔌 Socket connected:", socketRef.current.id);
         setConnected(true);
+        const sendTime = Date.now();
+        socketRef.current.emit("sync_time_ping", { sendTime });
+      });
+
+      socketRef.current.on("sync_time_pong", ({ sendTime, serverTime }) => {
+        const receiveTime = Date.now();
+        const rtt = receiveTime - sendTime;
+        const estimatedServerTime = serverTime + rtt / 2;
+        const offset = estimatedServerTime - receiveTime;
+        console.log(`⏰ Time Sync: RTT = ${rtt}ms, Clock Offset = ${offset}ms`);
+        setClockOffset(offset);
       });
 
       socketRef.current.on("disconnect", () => {
@@ -51,8 +63,10 @@ export function SocketProvider({ children }) {
     };
   }, [user]);
 
+  const serverNow = () => Date.now() + clockOffset;
+
   return (
-    <SocketContext.Provider value={{ socket: socketRef.current, connected }}>
+    <SocketContext.Provider value={{ socket: socketRef.current, connected, clockOffset, serverNow }}>
       {children}
     </SocketContext.Provider>
   );

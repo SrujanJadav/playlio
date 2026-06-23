@@ -182,6 +182,7 @@ export default function LandingPage() {
             background="linear-gradient(135deg,#39ff88,#7c4dff)"
             borderColor="#0a0612"
             className="flex items-center gap-4 px-12 py-5 text-base font-bold sm:px-16 sm:py-6 sm:text-lg"
+            style={{ fontFamily: "'VT323', monospace", fontSize: "1.5rem" }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

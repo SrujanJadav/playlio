@@ -9,6 +9,7 @@ import QuizDisplay from "../components/QuizDisplay";
 import MusicQuizDisplay from "../components/MusicQuizDisplay";
 import AlbumRevealOverlay from "../components/AlbumRevealOverlay";
 import CouplesQuizDisplay from "../components/CouplesQuizDisplay";
+import WordSelector from "../components/WordSelector";
 import ChatBox from "../components/ChatBox";
 import PlayersSidebar from "../components/PlayersSidebar";
 import BackgroundMusic, { useBgm } from "../components/BackgroundMusic";
@@ -46,23 +47,32 @@ const WaitingRoomToggle = ({ label, checked, onChange, disabled }) => {
 };
 
 // Round timer hook
-function useTimer(initialSeconds) {
-  const [seconds, setSeconds] = useState(initialSeconds);
+function useTimer() {
+  const { serverNow } = useSocket();
+  const [seconds, setSeconds] = useState(0);
   const intervalRef = useRef(null);
 
-  const start = useCallback((s) => {
-    setSeconds(s);
+  const start = useCallback((durationOrTimestamp, isTimestamp = false) => {
     clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => {
-        if (prev <= 1) { clearInterval(intervalRef.current); return 0; }
-        return prev - 1;
-      });
-    }, 1000);
-  }, []);
+
+    const updateTimer = () => {
+      const now = serverNow ? serverNow() : Date.now();
+      const targetTime = isTimestamp ? durationOrTimestamp : now + durationOrTimestamp * 1000;
+      const diff = Math.max(0, Math.round((targetTime - now) / 1000));
+      setSeconds(diff);
+
+      if (diff <= 0) {
+        clearInterval(intervalRef.current);
+      }
+    };
+
+    updateTimer();
+    intervalRef.current = setInterval(updateTimer, 200);
+  }, [serverNow]);
 
   const stop = useCallback(() => {
     clearInterval(intervalRef.current);
+    setSeconds(0);
   }, []);
 
   useEffect(() => () => clearInterval(intervalRef.current), []);
@@ -81,7 +91,7 @@ export default function GamePage() {
   const { code } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { socket } = useSocket();
+  const { socket, serverNow } = useSocket();
 
   const [room, setRoom] = useState(null);
   const [players, setPlayers] = useState([]);
@@ -105,6 +115,7 @@ export default function GamePage() {
   const [musicOptions, setMusicOptions] = useState([]);
   const [musicReveal, setMusicReveal] = useState(null);     // { answer, artist, cover, audio } or null
   const [revealSeconds, setRevealSeconds] = useState(0);
+  const [revealEndTime, setRevealEndTime] = useState(null);
   const [musicAudio, setMusicAudio] = useState("");
 
   // Couples mode state
@@ -114,7 +125,12 @@ export default function GamePage() {
   const [couplesGuesser, setCouplesGuesser] = useState({ id: null, name: "" });
   const [couplesReveal, setCouplesReveal] = useState(null);
 
-  const { seconds, start: startTimer, stop: stopTimer } = useTimer(80);
+  // Word selector state
+  const [isChoosingWord, setIsChoosingWord] = useState(false);
+  const [wordOptions, setWordOptions] = useState([]);
+  const [isWordSelector, setIsWordSelector] = useState(false);
+
+  const { seconds, start: startTimer, stop: stopTimer } = useTimer();
 
   const currentPlayer = players.find(p => p.userId === user?._id);
   const isSpectator = currentPlayer?.isSpectator;
@@ -175,20 +191,42 @@ export default function GamePage() {
       toast.success(`Game started! Category: ${CATEGORY_META[category]?.label || category} 🎮`);
     });
 
-    socket.on("round_started", ({ drawerId, drawerName, round, maskedWord, duration }) => {
+    socket.on("choose_word", ({ options, duration, round, totalRounds, roundEndTime }) => {
+      setWordOptions(options);
+      setIsChoosingWord(true);
+      setIsWordSelector(true);
+      setRound(round);
+      setTotalRounds(totalRounds);
+      startTimer(roundEndTime || duration, !!roundEndTime);
+    });
+
+    socket.on("drawer_choosing_word", ({ drawerId, drawerName, round, totalRounds, duration, roundEndTime }) => {
+      setCurrentDrawer(drawerId);
+      setWordOptions([]);
+      setIsChoosingWord(true);
+      setIsWordSelector(false);
+      setRound(round);
+      setTotalRounds(totalRounds);
+      startTimer(roundEndTime || duration, !!roundEndTime);
+      toast(`Round ${round} — ${drawerName} is choosing a word... ✏️`);
+    });
+
+    socket.on("round_started", ({ drawerId, drawerName, round, maskedWord, duration, roundEndTime }) => {
       setCurrentDrawer(drawerId);
       setRound(round);
       setMaskedWord(maskedWord);
       setCurrentWord("");
       setRoundWord("");
-      startTimer(duration);
+      setIsChoosingWord(false);
+      startTimer(roundEndTime || duration, !!roundEndTime);
       toast(`Round ${round} — ${drawerName} is drawing! ✏️`);
     });
 
-    socket.on("your_turn_to_draw", ({ word, round, duration }) => {
+    socket.on("your_turn_to_draw", ({ word, round, duration, roundEndTime }) => {
       setCurrentWord(word);
       setRound(round);
-      startTimer(duration);
+      setIsChoosingWord(false);
+      startTimer(roundEndTime || duration, !!roundEndTime);
       toast.success(`Your word: "${word}" — go draw! 🎨`, { duration: 5000 });
     });
 
@@ -200,6 +238,7 @@ export default function GamePage() {
       stopTimer();
       setRoundWord(word);
       setScores({ ...scores });
+      setIsChoosingWord(false);
       toast(`Round ${round} over! The word was: "${word}" 💡`);
     });
 
@@ -208,11 +247,11 @@ export default function GamePage() {
     });
 
     // ── Kids quiz mode events ──
-    socket.on("quiz_round_started", ({ image, round, duration }) => {
+    socket.on("quiz_round_started", ({ image, round, duration, roundEndTime }) => {
       setQuizImage(image);
       setQuizAnswer("");
       setRound(round);
-      startTimer(duration);
+      startTimer(roundEndTime || duration, !!roundEndTime);
     });
 
     socket.on("quiz_round_ended", ({ answer, scores, round }) => {
@@ -223,26 +262,29 @@ export default function GamePage() {
     });
 
     // ── Music quiz mode events ──
-    socket.on("music_round_started", ({ clue, options, round, duration, audio }) => {
+    socket.on("music_round_started", ({ clue, options, round, duration, audio, roundEndTime }) => {
       setMusicClue(clue);
       setMusicOptions(options);
       setMusicReveal(null);
       setMusicAudio(audio || "");
       setRound(round);
-      startTimer(duration);
+      startTimer(roundEndTime || duration, !!roundEndTime);
     });
 
-    socket.on("music_reveal", ({ answer, artist, cover, audio, scores, round, duration }) => {
+    socket.on("music_reveal", ({ answer, artist, cover, audio, scores, round, duration, roundEndTime }) => {
       stopTimer();
       setScores({ ...scores });
       setMusicReveal({ answer, artist, cover, audio });
-      setRevealSeconds(duration);
+      const now = serverNow ? serverNow() : Date.now();
+      const targetTime = roundEndTime || (now + duration * 1000);
+      setRevealEndTime(targetTime);
+      setRevealSeconds(Math.max(0, Math.round((targetTime - now) / 1000)));
     });
 
     // ── Couples mode events ──
     socket.on("couples_round_started", ({
       round, totalRounds, genre, question, options,
-      answererId, answererName, guesserId, guesserName, duration,
+      answererId, answererName, guesserId, guesserName, duration, roundEndTime,
     }) => {
       setRound(round);
       setTotalRounds(totalRounds);
@@ -251,12 +293,12 @@ export default function GamePage() {
       setCouplesGuesser({ id: guesserId, name: guesserName });
       setCouplesPhase("answering");
       setCouplesReveal(null);
-      startTimer(duration);
+      startTimer(roundEndTime || duration, !!roundEndTime);
     });
 
-    socket.on("couples_phase_guessing", ({ duration }) => {
+    socket.on("couples_phase_guessing", ({ duration, roundEndTime }) => {
       setCouplesPhase("guessing");
-      startTimer(duration);
+      startTimer(roundEndTime || duration, !!roundEndTime);
     });
 
     socket.on("couples_answerer_ready", () => {
@@ -279,6 +321,7 @@ export default function GamePage() {
       stopTimer();
       setGamePhase("finished");
       setFinalScores(finalScores);
+      setIsChoosingWord(false);
     });
 
     socket.on("room_dissolved", ({ message }) => {
@@ -306,6 +349,8 @@ export default function GamePage() {
       socket.off("game_started");
       socket.off("round_started");
       socket.off("your_turn_to_draw");
+      socket.off("choose_word");
+      socket.off("drawer_choosing_word");
       socket.off("correct_guess");
       socket.off("round_ended");
       socket.off("hint_reveal");
@@ -342,12 +387,16 @@ export default function GamePage() {
 
   // ── Reveal overlay countdown (music quiz) ──────────────────────
   useEffect(() => {
-    if (!musicReveal || revealSeconds <= 0) return;
-    const interval = setInterval(() => {
-      setRevealSeconds(s => Math.max(0, s - 1));
-    }, 1000);
+    if (!musicReveal || !revealEndTime) return;
+    const update = () => {
+      const now = serverNow ? serverNow() : Date.now();
+      const diff = Math.max(0, Math.round((revealEndTime - now) / 1000));
+      setRevealSeconds(diff);
+    };
+    update();
+    const interval = setInterval(update, 200);
     return () => clearInterval(interval);
-  }, [musicReveal, revealSeconds]);
+  }, [musicReveal, revealEndTime, serverNow]);
 
   if (loading) {
     return (
@@ -782,6 +831,17 @@ export default function GamePage() {
                 revealAnswer={musicReveal?.answer || null}
                 audio={musicAudio}
                 isSpectator={isSpectator}
+              />
+            ) : isChoosingWord ? (
+              <WordSelector
+                options={wordOptions}
+                isSelector={isWordSelector}
+                drawerName={players.find(p => p.userId?.toString() === currentDrawer)?.username || "Drawer"}
+                seconds={seconds}
+                onSelect={(word) => {
+                  socket.emit("select_word", { roomCode: code, word });
+                }}
+                catBorder={cat.border}
               />
             ) : isKidsMode ? (
               <QuizDisplay imageUrl={quizImage} seconds={seconds} />

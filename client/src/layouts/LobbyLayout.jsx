@@ -20,7 +20,7 @@ export default function LobbyLayout() {
       <BackgroundMusic category="lobby" />
 
       {/* ── Persistent Background Animations ── */}
-      <ArkanoidBackground opacity={0.35} />
+      <ArkanoidBackground opacity={1.00} />
       <div className="fixed inset-0" style={{ zIndex: 1, pointerEvents: "none" }}>
         <FaultyTerminal
           scale={1.8}
@@ -38,7 +38,7 @@ export default function LobbyLayout() {
           mouseReact={true}
           mouseStrength={0.3}
           pageLoadAnimation={true}
-          brightness={theme === "light" ? 1.0 : 0.5}
+          brightness={theme === "light" ? 0.75 : 0.5}
           style={{ width: "100%", height: "100%", opacity: theme === "light" ? 0.75 : 0.45 }}
         />
       </div>
