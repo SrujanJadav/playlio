@@ -65,7 +65,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="relative z-10 page-container py-10 flex flex-col items-center">
+    <div className="relative z-10 page-container pt-16 pb-12 flex flex-col items-center">
       
       {/* ── CONSTRAINED CONTENT WRAPPER (1100px Max-Width) ── */}
       <div className="w-full max-w-[1100px] flex flex-col gap-8">
