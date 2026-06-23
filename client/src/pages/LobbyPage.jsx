@@ -215,7 +215,7 @@ export default function LobbyPage() {
       </PixelPanel>
 
       {/* 2. TAB CONTROLS */}
-      <div className="flex justify-center mb-10 w-full">
+      <div className="flex justify-center mb-10 w-full" style={{ paddingTop: "8px" }}>
         <LiquidGlassTabs
           activeTab={tab}
           onChange={setTab}
