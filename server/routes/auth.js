@@ -85,8 +85,16 @@ router.get(
 // ─── CURRENT USER ────────────────────────────────────────────────
 
 // GET /api/auth/me — returns logged-in user info
-router.get("/me", authMiddleware, (req, res) => {
-  res.json({ user: req.user.toPublicJSON() });
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate("friendRequests.from", "username avatar totalPoints badges")
+      .select("-__v");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load user info" });
+  }
 });
 
 // ─── LOGOUT ──────────────────────────────────────────────────────

@@ -116,6 +116,26 @@ router.post("/friend-request/:id/accept", authMiddleware, async (req, res) => {
   }
 });
 
+// POST /api/user/friend-request/:id/reject — reject/dismiss a friend request
+router.post("/friend-request/:id/reject", authMiddleware, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user._id);
+    const requestIndex = currentUser.friendRequests.findIndex(
+      (r) => r.from.toString() === req.params.id
+    );
+
+    if (requestIndex === -1) return res.status(404).json({ error: "No such request" });
+
+    // Delete the request from current user's list
+    currentUser.friendRequests.splice(requestIndex, 1);
+    await currentUser.save();
+
+    res.json({ message: "Friend request rejected" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to reject request" });
+  }
+});
+
 // GET /api/user/search?q=username — search for players
 router.get("/search", authMiddleware, async (req, res) => {
   try {
