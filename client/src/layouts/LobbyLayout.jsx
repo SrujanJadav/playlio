@@ -15,13 +15,7 @@ export default function LobbyLayout() {
   const { theme } = useTheme();
 
   return (
-    <div 
-      className={`min-h-screen flex flex-col items-center w-full ${theme === "light" ? "theme-light" : ""}`} 
-      style={{ 
-        background: theme === "light" ? "#ffffff" : "#0a0612",
-        transition: "background-color 0.5s ease" 
-      }}
-    >
+    <div className="min-h-screen flex flex-col items-center w-full" style={{ background: "#0a0612" }}>
       <TargetCursor />
       <BackgroundMusic category="lobby" />
 
@@ -40,12 +34,12 @@ export default function LobbyLayout() {
           chromaticAberration={0}
           dither={0.3}
           curvature={0.15}
-          tint="#39ff88"
+          tint={theme === "light" ? "#ffffff" : "#39ff88"}
           mouseReact={true}
           mouseStrength={0.3}
           pageLoadAnimation={true}
-          brightness={0.5}
-          style={{ width: "100%", height: "100%", opacity: 0.45 }}
+          brightness={theme === "light" ? 1.0 : 0.5}
+          style={{ width: "100%", height: "100%", opacity: theme === "light" ? 0.75 : 0.45 }}
         />
       </div>
 
