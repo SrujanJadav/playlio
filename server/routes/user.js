@@ -102,13 +102,17 @@ router.post("/friend-request/:id/accept", authMiddleware, async (req, res) => {
 
     const otherUser = await User.findById(req.params.id);
     otherUser.friends.push(req.user._id);
-    await otherUser.save();
 
     // Check social butterfly badge
     if (currentUser.friends.length >= 5 && !currentUser.badges.includes("social_butterfly")) {
       currentUser.badges.push("social_butterfly");
-      await currentUser.save();
     }
+    if (otherUser.friends.length >= 5 && !otherUser.badges.includes("social_butterfly")) {
+      otherUser.badges.push("social_butterfly");
+    }
+
+    await currentUser.save();
+    await otherUser.save();
 
     res.json({ message: "Friend added!" });
   } catch (err) {

@@ -746,6 +746,7 @@ module.exports = (io) => {
 
           if (activeGames[roomCode]) {
             activeGames[roomCode].scores[userId] = 0;
+            activeGames[roomCode].guessStreaks[userId] = 0;
           }
 
           socket.emit("room_joined", { room });
@@ -863,6 +864,7 @@ module.exports = (io) => {
           musicAnswerTime: room.musicAnswerTime || 15,
           musicGenre: room.musicGenre || "mixed",
           scores: {},
+          guessStreaks: {},
           guessedThisRound: new Set(),
           category: room.category,
           timer: null,
@@ -881,9 +883,10 @@ module.exports = (io) => {
           activeGames[roomCode].musicBank = filteredBank;
         }
 
-        // Give everyone in room their initial 0 points
+        // Give everyone in room their initial 0 points and reset guess streak
         room.players.forEach((p) => {
           activeGames[roomCode].scores[p.userId?.toString()] = 0;
+          activeGames[roomCode].guessStreaks[p.userId?.toString()] = 0;
         });
 
         io.to(roomCode).emit("game_started", {
@@ -1156,6 +1159,35 @@ module.exports = (io) => {
 
   // ─── ROUND LOGIC ─────────────────────────────────────────────────
 
+  async function updateGuessStreaks(io, roomCode, correctUserIds, ignoreUserIds = []) {
+    const game = activeGames[roomCode];
+    if (!game) return;
+
+    for (const playerId of game.playerOrder) {
+      if (ignoreUserIds.includes(playerId)) {
+        continue;
+      }
+
+      if (correctUserIds.has(playerId)) {
+        game.guessStreaks[playerId] = (game.guessStreaks[playerId] || 0) + 1;
+        if (game.guessStreaks[playerId] >= 3) {
+          try {
+            const u = await User.findById(playerId);
+            if (u && !u.badges.includes("streak_3")) {
+              u.badges.push("streak_3");
+              await u.save();
+              io.to(roomCode).emit("badge_unlocked", { userId: playerId, badge: "streak_3" });
+            }
+          } catch (err) {
+            console.error("Error awarding streak_3 badge:", err);
+          }
+        }
+      } else {
+        game.guessStreaks[playerId] = 0;
+      }
+    }
+  }
+
   async function promoteSpectators(roomCode) {
     try {
       const room = await Room.findOne({ code: roomCode });
@@ -1320,6 +1352,9 @@ module.exports = (io) => {
     if (game.hintTimer1) clearTimeout(game.hintTimer1);
     if (game.hintTimer2) clearTimeout(game.hintTimer2);
 
+    // Track guess streaks (exclude the drawer)
+    await updateGuessStreaks(io, roomCode, game.guessedThisRound, [game.currentDrawerId]);
+
     const word = game.currentWord;
 
     io.to(roomCode).emit("round_ended", {
@@ -1434,6 +1469,9 @@ module.exports = (io) => {
     const game = activeGames[roomCode];
     if (!game) return;
 
+    // Track guess streaks (everyone is a guesser)
+    await updateGuessStreaks(io, roomCode, game.guessedThisRound, []);
+
     const answer = game.currentWord;
 
     io.to(roomCode).emit("quiz_round_ended", {
@@ -1472,6 +1510,7 @@ module.exports = (io) => {
     if (!room) return;
 
     game.guessedThisRound = new Set();
+    game.correctGuessesThisRound = new Set();
 
     // Pick a random song from the filtered bank, avoid repeating the same one back-to-back
     let song;
@@ -1524,6 +1563,10 @@ module.exports = (io) => {
     const isCorrect = selected === game.currentSong?.answer;
 
     if (isCorrect) {
+      if (!game.correctGuessesThisRound) {
+        game.correctGuessesThisRound = new Set();
+      }
+      game.correctGuessesThisRound.add(userId);
       // Tiered points: 1st correct = 100, 2nd = 70, 3rd = 50, then 30 for the rest
       const tierPoints = [100, 70, 50];
       const basePoints = tierPoints[game.guessRank] ?? 30;
@@ -1559,6 +1602,9 @@ module.exports = (io) => {
   async function revealMusicAnswer(io, roomCode) {
     const game = activeGames[roomCode];
     if (!game) return;
+
+    // Track guess streaks (everyone is a guesser)
+    await updateGuessStreaks(io, roomCode, game.correctGuessesThisRound || new Set(), []);
 
     const song = game.currentSong;
     const revealDuration = song.revealDuration || 15;
@@ -1782,23 +1828,23 @@ module.exports = (io) => {
           avatar: room.players.find((p) => p.userId?.toString() === userId)?.avatar,
         }));
 
-      // Save points to user accounts in DB
-      for (const { userId, points } of finalScores) {
-        await User.findByIdAndUpdate(userId, {
-          $inc: {
-            totalPoints: points,
-            gamesPlayed: 1,
-          },
-        });
-      }
-
-      // Award win to top player
-      if (finalScores[0]) {
-        const winner = await User.findById(finalScores[0].userId);
-        if (winner) {
-          winner.gamesWon += 1;
-          if (!winner.badges.includes("first_win")) winner.badges.push("first_win");
-          await winner.save();
+      // Save points and stats to user accounts in DB
+      for (let i = 0; i < finalScores.length; i++) {
+        const { userId, points } = finalScores[i];
+        try {
+          const u = await User.findById(userId);
+          if (u) {
+            u.gamesPlayed += 1;
+            if (i === 0) {
+              u.gamesWon += 1;
+              if (!u.badges.includes("first_win")) {
+                u.badges.push("first_win");
+              }
+            }
+            await u.addPoints(points);
+          }
+        } catch (dbErr) {
+          console.error(`Failed to update stats for user ${userId}:`, dbErr);
         }
       }
 

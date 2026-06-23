@@ -179,7 +179,7 @@ export default function LobbyPage() {
   };
 
   return (
-    <div className="relative z-10 page-container pb-16 pt-8 flex flex-col items-center">
+    <div className="relative z-10 page-container pb-16 flex flex-col items-center" style={{ paddingTop: "20px" }}>
 
       {/* 1. WELCOME CARD */}
       <PixelPanel
@@ -377,7 +377,7 @@ export default function LobbyPage() {
                           HOST PRIVILEGES
                         </span>
                       </div>
-                      
+
                       <Toggle
                         label="Kick Players"
                         description="Allow host to remove players from waiting room"

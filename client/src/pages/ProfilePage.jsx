@@ -6,18 +6,18 @@ import PixelEmoji from "../components/PixelEmoji";
 import PixelPanel from "../components/PixelPanel";
 
 const BADGE_META = {
-  first_win:        { icon:"🏆", label:"First Win",         desc:"Won your first game!" },
-  streak_3:         { icon:"🔥", label:"On Fire",           desc:"3 correct guesses in a row!" },
-  points_500:       { icon:"⭐", label:"Rising Star",       desc:"Earned 500 points total" },
-  points_1000:      { icon:"💎", label:"Diamond Player",    desc:"Earned 1000 points total" },
-  social_butterfly: { icon:"🦋", label:"Social Butterfly",  desc:"Made 5 or more friends" },
+  first_win: { icon: "🏆", label: "First Win", desc: "Won your first game!" },
+  streak_3: { icon: "🔥", label: "On Fire", desc: "3 correct guesses in a row!" },
+  points_500: { icon: "⭐", label: "Rising Star", desc: "Earned 500 points total" },
+  points_1000: { icon: "💎", label: "Diamond Player", desc: "Earned 1000 points total" },
+  social_butterfly: { icon: "🦋", label: "Social Butterfly", desc: "Made 5 or more friends" },
 };
 
 const ALL_BADGES = Object.keys(BADGE_META);
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
-  const [search,  setSearch]  = useState("");
+  const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [requests, setRequests] = useState([]);
 
@@ -65,11 +65,11 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="relative z-10 page-container pt-16 pb-12 flex flex-col items-center">
-      
+    <div className="relative z-10 page-container pb-12 flex flex-col items-center" style={{ paddingTop: "20px" }}>
+
       {/* ── CONSTRAINED CONTENT WRAPPER (1100px Max-Width) ── */}
       <div className="w-full max-w-[1100px] flex flex-col gap-8">
-        
+
         {/* PROFILE HEADER CARD */}
         <PixelPanel className="w-full p-8 text-center transition-transform hover:scale-[1.005] flex flex-col items-center" borderColor="rgba(200,168,255,0.4)">
           <div className="relative inline-block mb-4">
@@ -85,7 +85,7 @@ export default function ProfilePage() {
             <img
               src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`}
               className="w-24 h-24 rounded-full float relative z-10"
-              style={{ border:"3px solid #c8a8ff" }} />
+              style={{ border: "3px solid #c8a8ff" }} />
             <div className="absolute bottom-1 right-1 text-xl z-20"><PixelEmoji>🎨</PixelEmoji></div>
           </div>
           <h1 className="font-display text-3xl text-glow-soft" style={{ color: "#f0e0ff" }}>
@@ -99,9 +99,9 @@ export default function ProfilePage() {
         {/* STANDALONE STATS ROW */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
           {[
-            { label:"Total Points", value: user?.totalPoints?.toLocaleString() ?? 0, border:"#f0c840", icon:"⭐", glow:"rgba(240,200,64,0.2)" },
-            { label:"Games Played", value: user?.gamesPlayed ?? 0, border:"#84c8ff", icon:"🎮", glow:"rgba(132,200,255,0.2)" },
-            { label:"Games Won",    value: user?.gamesWon ?? 0, border:"#6dd5a8", icon:"🏆", glow:"rgba(109,213,168,0.2)" },
+            { label: "Total Points", value: user?.totalPoints?.toLocaleString() ?? 0, border: "#f0c840", icon: "⭐", glow: "rgba(240,200,64,0.2)" },
+            { label: "Games Played", value: user?.gamesPlayed ?? 0, border: "#84c8ff", icon: "🎮", glow: "rgba(132,200,255,0.2)" },
+            { label: "Games Won", value: user?.gamesWon ?? 0, border: "#6dd5a8", icon: "🏆", glow: "rgba(109,213,168,0.2)" },
           ].map(s => (
             <PixelPanel key={s.label} borderColor={s.border} className="flex flex-col items-center justify-center p-6 transition-transform hover:scale-[1.02]"
               style={{
@@ -117,13 +117,13 @@ export default function ProfilePage() {
 
         {/* BADGES SECTION */}
         <PixelPanel className="p-8 w-full" borderColor="rgba(200,168,255,0.3)">
-          <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color:"#c8a8ff" }}>
+          <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color: "#c8a8ff" }}>
             <span><PixelEmoji>🏅</PixelEmoji></span> Badges
           </h2>
           <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
             {ALL_BADGES.map(b => {
-              const meta    = BADGE_META[b];
-              const earned  = user?.badges?.includes(b);
+              const meta = BADGE_META[b];
+              const earned = user?.badges?.includes(b);
               return (
                 <PixelPanel key={b}
                   borderColor={earned ? "#f0c840" : "rgba(200,168,255,0.2)"}
@@ -152,11 +152,11 @@ export default function ProfilePage() {
 
         {/* SIDE-BY-SIDE GRID SECTION: FIND FRIENDS & PENDING REQUESTS */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-stretch">
-          
+
           {/* FIND PLAYERS (SEARCH) SECTION */}
           <PixelPanel className="p-8 flex flex-col h-full justify-between" borderColor="rgba(132,200,255,0.35)">
             <div>
-              <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color:"#84c8ff" }}>
+              <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color: "#84c8ff" }}>
                 <span><PixelEmoji>🔍</PixelEmoji></span> Find Players
               </h2>
               <div className="flex gap-3 mb-6">
@@ -174,12 +174,12 @@ export default function ProfilePage() {
                   }} />
                 <button onClick={handleSearch}
                   className="btn-bounce px-6 py-4 font-body font-bold text-sm cursor-target rounded-none"
-                  style={{ background:"#84c8ff", color:"#0a0612", border:"none", cursor:"pointer" }}>
+                  style={{ background: "#84c8ff", color: "#0a0612", border: "none", cursor: "pointer" }}>
                   Search
                 </button>
               </div>
             </div>
-            
+
             <div className="space-y-3 flex-1 overflow-y-auto max-h-[320px] pr-2">
               {results.length === 0 && search && (
                 <p className="font-body text-sm text-center text-white/30 py-4">No players found.</p>
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                   <PixelPanel key={u._id} className="flex items-center gap-4 px-6 py-4 animate-fade-in"
                     borderColor="rgba(132,200,255,0.25)" background="rgba(255,255,255,0.02)">
                     <img src={u.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.username}`}
-                      className="w-10 h-10 rounded-full" style={{ border:"2px solid #84c8ff" }} />
+                      className="w-10 h-10 rounded-full" style={{ border: "2px solid #84c8ff" }} />
                     <div className="flex-1 min-w-0">
                       <p className="font-body font-bold text-sm text-[#f0e0ff] truncate">{u.username}</p>
                       <p className="font-body text-xs text-[rgba(240,224,255,0.5)]"><PixelEmoji>⭐</PixelEmoji> {u.totalPoints} pts</p>
@@ -203,13 +203,13 @@ export default function ProfilePage() {
                     ) : hasIncoming ? (
                       <button onClick={() => acceptFriendRequest(u._id)}
                         className="btn-bounce px-4 py-2 rounded-xl font-body text-xs font-bold cursor-target"
-                        style={{ background:"#6dd5a8", color:"#0a0612", border:"none", cursor:"pointer" }}>
+                        style={{ background: "#6dd5a8", color: "#0a0612", border: "none", cursor: "pointer" }}>
                         Accept
                       </button>
                     ) : (
                       <button onClick={() => sendFriendRequest(u._id)}
                         className="btn-bounce px-4 py-2 rounded-xl font-body text-xs font-bold cursor-target"
-                        style={{ background:"rgba(200,168,255,0.15)", color:"#c8a8ff", border:"1.5px solid #c8a8ff", cursor:"pointer" }}>
+                        style={{ background: "rgba(200,168,255,0.15)", color: "#c8a8ff", border: "1.5px solid #c8a8ff", cursor: "pointer" }}>
                         + Add Friend
                       </button>
                     )}
@@ -221,7 +221,7 @@ export default function ProfilePage() {
 
           {/* FRIEND REQUESTS SECTION */}
           <PixelPanel className="p-8 flex flex-col h-full" borderColor="rgba(109,213,168,0.35)">
-            <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color:"#6dd5a8" }}>
+            <h2 className="font-display text-xl mb-6 flex items-center gap-2" style={{ color: "#6dd5a8" }}>
               <span><PixelEmoji>🔔</PixelEmoji></span> Friend Requests
             </h2>
             {requests.length === 0 ? (
@@ -238,7 +238,7 @@ export default function ProfilePage() {
                     borderColor="rgba(109,213,168,0.25)" background="rgba(109,213,168,0.04)">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <img src={r.from?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${r.from?.username || r.from}`}
-                        className="w-8 h-8 rounded-full" style={{ border:"1.5px solid #6dd5a8" }} />
+                        className="w-8 h-8 rounded-full" style={{ border: "1.5px solid #6dd5a8" }} />
                       <span className="font-body text-sm text-[#f0e0ff] truncate">
                         <strong className="text-[#6dd5a8]">{r.from?.username || "Someone"}</strong>
                       </span>
@@ -246,12 +246,12 @@ export default function ProfilePage() {
                     <div className="flex gap-2 flex-shrink-0">
                       <button onClick={() => acceptFriendRequest(r.from?._id || r.from)}
                         className="btn-bounce px-3 py-2 rounded-xl font-body text-xs font-bold cursor-target"
-                        style={{ background:"#6dd5a8", color:"#0a0612", border:"none", cursor:"pointer" }}>
+                        style={{ background: "#6dd5a8", color: "#0a0612", border: "none", cursor: "pointer" }}>
                         Accept ✓
                       </button>
                       <button onClick={() => rejectFriendRequest(r.from?._id || r.from)}
                         className="btn-bounce px-3 py-2 rounded-xl font-body text-xs font-bold cursor-target"
-                        style={{ background:"rgba(255,99,99,0.15)", color:"#ff8888", border:"1.5px solid #ff5555", cursor:"pointer" }}>
+                        style={{ background: "rgba(255,99,99,0.15)", color: "#ff8888", border: "1.5px solid #ff5555", cursor: "pointer" }}>
                         Reject
                       </button>
                     </div>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
               </div>
             )}
           </PixelPanel>
-          
+
         </div>
 
       </div>
