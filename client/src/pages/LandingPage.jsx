@@ -8,6 +8,7 @@ import TypingMessages from "../components/TypingMessages";
 import PixelButton from "../components/PixelButton";
 import PixelPanel from "../components/PixelPanel";
 import PixelEmoji from "../components/PixelEmoji";
+import TargetCursor from "../components/TargetCursor";
 
 const TITLE_LETTERS = [
   { ch: "P", color: "#ff99cc" },
@@ -65,6 +66,7 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden" style={{ background: "#0a0612" }}>
+      <TargetCursor />
 
       {/* ── Animated background: Arkanoid + CRT glitch overlay ── */}
       <ArkanoidBackground opacity={0.8} />
@@ -98,7 +100,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-end justify-center gap-0 cursor-default select-none mb-6 relative z-10"
+          className="flex items-end justify-center gap-0 cursor-default select-none mb-12 relative z-10"
         >
           {TITLE_LETTERS.map((l, i) => (
             <span
@@ -124,7 +126,7 @@ export default function LandingPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1 className="font-display text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-8 tracking-wider"
+          <h1 className="font-display text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-14 tracking-wider"
             style={{ color: "#f0e0ff", lineHeight: 1.4 }}>
             DRAW IT. GUESS IT. PRESS START.
           </h1>
@@ -136,7 +138,7 @@ export default function LandingPage() {
           transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-xl mx-auto"
         >
-          <p className="font-body text-lg md:text-xl leading-relaxed mb-2" style={{ color: "#d8c8f0" }}>
+          <p className="font-body text-lg md:text-xl leading-relaxed mb-6" style={{ color: "#d8c8f0" }}>
             A real-time multiplayer arcade with four game modes — drawing battles, animal quizzes,
             music trivia, and a couples mode built just for two.
           </p>
@@ -150,14 +152,15 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-8 w-full max-w-sm rounded-lg px-5 py-4"
+          className="w-full max-w-sm rounded-lg px-5 py-4"
           style={{
             background: "rgba(10,20,15,0.7)",
             border: "2px solid #2d5a42",
             backdropFilter: "blur(8px)",
+            marginTop: "12px",
           }}
         >
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-6 mb-2">
             <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#ff9999" }} />
             <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#f0c840" }} />
             <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#6dd5a8" }} />
@@ -171,15 +174,16 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10"
+          className="flex flex-col items-center w-full"
+          style={{ marginTop: "16px", marginBottom: "10px" }}
         >
           <PixelButton
             onClick={handleGoogleLogin}
             background="linear-gradient(135deg,#39ff88,#7c4dff)"
             borderColor="#0a0612"
-            className="flex items-center gap-3 px-8 py-4 text-sm"
+            className="flex items-center gap-4 px-12 py-5 text-base font-bold sm:px-16 sm:py-6 sm:text-lg"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24">
+            <svg width="24" height="24" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -194,7 +198,10 @@ export default function LandingPage() {
         </motion.div>
 
         {/* ── Game mode cards ── */}
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full">
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full"
+          style={{ marginTop: "10px" }}
+        >
           {MODE_CARDS.map((mode, i) => (
             <motion.div
               key={mode.title}
@@ -227,7 +234,7 @@ export default function LandingPage() {
         </div>
 
         {/* ── How it works ── */}
-        <div className="mt-16 max-w-2xl w-full">
+        <div className="mt-32 max-w-2xl w-full">
           <h2 className="font-display text-lg mb-10" style={{ color: "#f0e0ff", lineHeight: 1.6 }}>
             How It Works
           </h2>
@@ -255,8 +262,7 @@ export default function LandingPage() {
 
       </div>
 
-      {/* Footer */}
-      <footer className="relative z-10 text-center py-8 font-body text-xs"
+      <footer className="relative z-10 text-center pt-24 pb-16 font-body text-xs"
         style={{ color: "#a890c8", opacity: 0.6 }}>
         Made with <PixelEmoji>💜</PixelEmoji> and a lot of bad drawings
       </footer>
