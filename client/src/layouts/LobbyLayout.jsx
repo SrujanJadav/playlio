@@ -4,6 +4,7 @@ import FaultyTerminal from "../components/FaultyTerminal";
 import BackgroundMusic from "../components/BackgroundMusic";
 import Navbar from "../components/Navbar";
 import TargetCursor from "../components/TargetCursor";
+import { useTheme } from "../context/ThemeContext";
 
 /**
  * Shared layout for Lobby / Leaderboard / Profile pages.
@@ -11,8 +12,16 @@ import TargetCursor from "../components/TargetCursor";
  * never restart or flash white.
  */
 export default function LobbyLayout() {
+  const { theme } = useTheme();
+
   return (
-    <div className="min-h-screen flex flex-col items-center" style={{ background: "#0a0612" }}>
+    <div 
+      className={`min-h-screen flex flex-col items-center w-full ${theme === "light" ? "theme-light" : ""}`} 
+      style={{ 
+        background: theme === "light" ? "#ffffff" : "#0a0612",
+        transition: "background-color 0.5s ease" 
+      }}
+    >
       <TargetCursor />
       <BackgroundMusic category="lobby" />
 

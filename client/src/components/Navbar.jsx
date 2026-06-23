@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import GooeyNav from "./GooeyNav";
 import toast from "react-hot-toast";
 import PixelEmoji from "./PixelEmoji";
+import Switch from "./Switch";
 
 const TITLE_LETTERS = [
   { ch: "P", color: "#ff99cc" },
@@ -148,8 +149,8 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* RIGHT — GooeyNav */}
-          <div className="flex items-center relative pr-2">
+          {/* RIGHT — GooeyNav & Switch Toggle */}
+          <div className="flex items-center gap-6 relative pr-2">
             <GooeyNav
               items={navItems}
               initialActiveIndex={currentIndex}
@@ -160,6 +161,9 @@ export default function Navbar() {
               timeVariance={250}
               colors={[1, 2, 3, 1, 2, 3, 1, 4]}
             />
+            <div className="no-invert shrink-0">
+              <Switch />
+            </div>
           </div>
           
         </div>

@@ -2,8 +2,8 @@ import React from "react";
 
 export default function PixelPanel({
   children,
-  borderColor = "rgba(255, 255, 255, 0.35)",
-  background = "rgba(10, 6, 18, 0.75)",
+  borderColor = "var(--panel-border, rgba(255, 255, 255, 0.35))",
+  background = "var(--panel-bg, rgba(10, 6, 18, 0.75))",
   className = "",
   style = {},
 }) {

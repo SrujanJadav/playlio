@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { AudioProvider } from "./context/AudioContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import PixelSpeaker from "./components/PixelSpeaker";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -48,13 +49,15 @@ function AppRoutes() {
 export default function App() {
   return (
     <AudioProvider>
-      <AuthProvider>
-        <SocketProvider>
-          <PixelSpeaker />
-          <ScrollToTop />
-          <AppRoutes />
-        </SocketProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <PixelSpeaker />
+            <ScrollToTop />
+            <AppRoutes />
+          </SocketProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </AudioProvider>
   );
 }

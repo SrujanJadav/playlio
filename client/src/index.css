@@ -151,3 +151,34 @@ body {
   border: 1.5px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 8px 40px rgba(255, 255, 255, 0.15), 0 4px 40px rgba(0, 0, 0, 0.5);
 }
+
+/* ── Theme custom variables ── */
+:root {
+  --panel-bg: rgba(10, 6, 18, 0.75);
+  --panel-border: rgba(255, 255, 255, 0.35);
+}
+
+html.light {
+  --panel-bg: rgba(253, 250, 255, 0.85);
+  --panel-border: rgba(45, 36, 56, 0.25);
+}
+
+/* ── Light Theme via inversion ── */
+.theme-light {
+  filter: invert(1) hue-rotate(180deg);
+  background: #ffffff !important;
+}
+
+/* Re-invert media assets and specified containers to keep original colors */
+.theme-light img,
+.theme-light video,
+.theme-light iframe,
+.theme-light .pixel-emoji,
+.theme-light .no-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Smooth transition for theme toggles */
+.theme-light * {
+  transition: filter 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
