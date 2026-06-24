@@ -201,6 +201,7 @@ export default function GamePage() {
     });
 
     socket.on("drawer_choosing_word", ({ drawerId, drawerName, round, totalRounds, duration, roundEndTime }) => {
+      if (drawerId === user?._id) return; // Skip if I am the drawer (choose_word event handles drawer!)
       setCurrentDrawer(drawerId);
       setWordOptions([]);
       setIsChoosingWord(true);
@@ -212,6 +213,7 @@ export default function GamePage() {
     });
 
     socket.on("round_started", ({ drawerId, drawerName, round, maskedWord, duration, roundEndTime }) => {
+      if (drawerId === user?._id) return; // Skip if I am the drawer (your_turn_to_draw handles drawer!)
       setCurrentDrawer(drawerId);
       setRound(round);
       setMaskedWord(maskedWord);
@@ -224,6 +226,7 @@ export default function GamePage() {
 
     socket.on("your_turn_to_draw", ({ word, round, duration, roundEndTime }) => {
       setCurrentWord(word);
+      setCurrentDrawer(user?._id);
       setRound(round);
       setIsChoosingWord(false);
       startTimer(roundEndTime || duration, !!roundEndTime);

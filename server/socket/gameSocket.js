@@ -1455,8 +1455,8 @@ module.exports = (io) => {
 
     const drawerName = room.players.find((p) => p.userId?.toString() === drawerId)?.username || "Someone";
 
-    // Set 5-second timer to auto-choose
-    const chooseDuration = 5;
+    // Set 15-second timer to auto-choose
+    const chooseDuration = 15;
     game.roundEndTime = Date.now() + chooseDuration * 1000;
 
     // Send choose_word ONLY to the drawer
