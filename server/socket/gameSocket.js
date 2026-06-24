@@ -720,23 +720,30 @@ module.exports = (io) => {
         }
 
         if (room.status === "playing") {
-          if (!room.allowLateJoin) {
+          const existingIndex = room.players.findIndex(
+            (p) => p.userId?.toString() === userId
+          );
+
+          if (existingIndex === -1 && !room.allowLateJoin) {
             socket.emit("error", { message: "Game already in progress" });
             return;
           }
-          // Join as spectator
+
+          // Join as spectator or reconnecting player
           socket.join(roomCode);
           socket.data.roomCode = roomCode;
           socket.data.userId = userId;
           socket.data.username = username;
 
-          const existingIndex = room.players.findIndex(
-            (p) => p.userId?.toString() === userId
-          );
+          let isSpectator = false;
 
           if (existingIndex !== -1) {
+            // Reconnecting player
             room.players[existingIndex].socketId = socket.id;
+            isSpectator = room.players[existingIndex].isSpectator || false;
           } else {
+            // New spectator joining late
+            isSpectator = true;
             room.players.push({
               userId,
               username,
@@ -745,18 +752,58 @@ module.exports = (io) => {
               socketId: socket.id,
               isSpectator: true,
             });
+            if (activeGames[roomCode]) {
+              activeGames[roomCode].scores[userId] = 0;
+              activeGames[roomCode].guessStreaks[userId] = 0;
+            }
           }
 
           await room.save();
 
-          if (activeGames[roomCode]) {
-            activeGames[roomCode].scores[userId] = 0;
-            activeGames[roomCode].guessStreaks[userId] = 0;
+          socket.emit("room_joined", { room });
+
+          // Sync game state to the reconnecting player
+          const game = activeGames[roomCode];
+          if (game) {
+            const timeRemaining = game.roundEndTime ? Math.max(0, game.roundEndTime - Date.now()) : 0;
+            
+            socket.emit("game_sync", {
+              category: game.category,
+              round: game.round,
+              totalRounds: game.totalRounds,
+              scores: game.scores,
+              isChoosingWord: game.isChoosingWord || false,
+              currentDrawerId: game.currentDrawerId || null,
+              wordOptions: game.wordOptions || [],
+              currentWord: game.currentDrawerId === userId ? game.currentWord : null,
+              maskedWord: game.currentWord ? game.currentWord.replace(/[a-zA-Z]/g, "_") : "",
+              roundWord: game.roundWord || null,
+              duration: timeRemaining / 1000,
+              roundEndTime: game.roundEndTime,
+              
+              // Kids mode
+              currentImage: game.currentImage || "",
+              quizAnswer: game.quizAnswer || null,
+              
+              // Music mode
+              musicClue: game.musicClue || "",
+              musicOptions: game.musicOptions || [],
+              musicReveal: game.musicReveal || null,
+              musicAudio: game.musicAudio || "",
+              
+              // Couples mode
+              couplesQuestion: game.currentQuestion || null,
+              couplesPhase: game.couplesPhase || "answering",
+              couplesAnswererId: game.answererId || null,
+              couplesAnswererName: room.players.find(p => p.userId?.toString() === game.answererId)?.username || "",
+              couplesGuesserId: game.guesserId || null,
+              couplesGuesserName: room.players.find(p => p.userId?.toString() === game.guesserId)?.username || "",
+              couplesReveal: game.couplesReveal || null,
+            });
           }
 
-          socket.emit("room_joined", { room });
           socket.to(roomCode).emit("player_joined", {
-            player: { userId, username, avatar, points: 0, isSpectator: true },
+            player: { userId, username, avatar, points: 0, isSpectator },
             players: room.players,
           });
           io.to(roomCode).emit("players_updated", { players: room.players });
@@ -1367,6 +1414,7 @@ module.exports = (io) => {
 
     // Reset guesses for new round
     game.guessedThisRound = new Set();
+    game.roundWord = null;
 
     // Pick the drawer
     const drawerId = game.playerOrder[game.currentDrawerIndex];
@@ -1453,6 +1501,7 @@ module.exports = (io) => {
     await updateGuessStreaks(io, roomCode, game.guessedThisRound, [game.currentDrawerId]);
 
     const word = game.currentWord;
+    game.roundWord = word;
 
     io.to(roomCode).emit("round_ended", {
       word,
@@ -1487,6 +1536,7 @@ module.exports = (io) => {
 
     // Reset guesses for new round
     game.guessedThisRound = new Set();
+    game.quizAnswer = null;
 
     // Select correct animal bank depending on difficulty setting
     const difficulty = game.quizDifficulty || "mixed";
@@ -1574,6 +1624,7 @@ module.exports = (io) => {
     await updateGuessStreaks(io, roomCode, game.guessedThisRound, []);
 
     const answer = game.currentWord;
+    game.quizAnswer = answer;
 
     io.to(roomCode).emit("quiz_round_ended", {
       answer,
@@ -1612,6 +1663,10 @@ module.exports = (io) => {
 
     game.guessedThisRound = new Set();
     game.correctGuessesThisRound = new Set();
+    game.musicReveal = null;
+    game.musicClue = null;
+    game.musicOptions = [];
+    game.musicAudio = null;
 
     // Pick a random song from the filtered bank, avoid repeating the same one back-to-back
     let song;
@@ -1643,6 +1698,10 @@ module.exports = (io) => {
         return match.split('').map(char => char === ' ' ? ' ' : '_').join('');
       });
     }
+
+    game.musicClue = maskedClue;
+    game.musicOptions = options;
+    game.musicAudio = song.audio;
 
     io.to(roomCode).emit("music_round_started", {
       clue: maskedClue,
@@ -1711,6 +1770,13 @@ module.exports = (io) => {
     const song = game.currentSong;
     const revealDuration = song.revealDuration || 15;
     game.roundEndTime = Date.now() + revealDuration * 1000;
+
+    game.musicReveal = {
+      answer: song.answer,
+      artist: song.artist,
+      cover: song.cover,
+      audio: song.audio,
+    };
 
     io.to(roomCode).emit("music_reveal", {
       answer: song.answer,
@@ -1792,6 +1858,7 @@ module.exports = (io) => {
     game.answererSelections = null;
     game.guesserSelections = null;
     game.couplesPhase = "answering"; // "answering" | "guessing" | "reveal"
+    game.couplesReveal = null;
 
     const answererName = room.players.find(p => p.userId?.toString() === answererId)?.username;
     const guesserName = room.players.find(p => p.userId?.toString() === guesserId)?.username;
@@ -1899,6 +1966,13 @@ module.exports = (io) => {
     game.scores[game.guesserId] = (game.scores[game.guesserId] || 0) + points;
 
     game.roundEndTime = Date.now() + COUPLES_REVEAL_DURATION * 1000;
+
+    game.couplesReveal = {
+      answererSelections: [...trueSet],
+      guesserSelections: [...guessSet],
+      pointsEarned: points,
+      guesserId: game.guesserId,
+    };
 
     io.to(roomCode).emit("couples_round_revealed", {
       round: game.round,

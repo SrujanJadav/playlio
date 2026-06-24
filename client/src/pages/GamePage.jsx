@@ -342,6 +342,65 @@ export default function GamePage() {
       toast.error(message);
     });
 
+    socket.on("game_sync", ({
+      category, round, totalRounds, scores, isChoosingWord: serverChoosingWord,
+      currentDrawerId, wordOptions: serverWordOptions, currentWord: serverWord,
+      maskedWord: serverMaskedWord, roundWord: serverRoundWord, duration, roundEndTime,
+      currentImage, quizAnswer: serverQuizAnswer, musicClue: serverMusicClue,
+      musicOptions: serverMusicOptions, musicReveal: serverMusicReveal, musicAudio: serverMusicAudio,
+      couplesQuestion: serverCouplesQuestion, couplesPhase: serverCouplesPhase,
+      couplesAnswererId, couplesAnswererName, couplesGuesserId, couplesGuesserName,
+      couplesReveal: serverCouplesReveal
+    }) => {
+      setGamePhase("playing");
+      setRound(round);
+      setTotalRounds(totalRounds);
+      setScores({ ...scores });
+      setCurrentDrawer(currentDrawerId);
+      
+      if (category === "general") {
+        setRoundWord(serverRoundWord || "");
+        setIsChoosingWord(serverChoosingWord);
+        if (serverChoosingWord) {
+          setWordOptions(serverWordOptions);
+          setIsWordSelector(currentDrawerId === user?._id);
+        } else {
+          setIsWordSelector(false);
+          if (currentDrawerId === user?._id) {
+            setCurrentWord(serverWord || "");
+          } else {
+            setMaskedWord(serverMaskedWord || "");
+          }
+        }
+      } else if (category === "kids") {
+        setQuizImage(currentImage);
+        setQuizAnswer(serverQuizAnswer || "");
+      } else if (category === "music") {
+        setMusicClue(serverMusicClue);
+        setMusicOptions(serverMusicOptions);
+        setMusicReveal(serverMusicReveal);
+        setMusicAudio(serverMusicAudio);
+        if (serverMusicReveal) {
+          const now = serverNow ? serverNow() : Date.now();
+          const targetTime = roundEndTime || (now + duration * 1000);
+          setRevealEndTime(targetTime);
+          setRevealSeconds(Math.max(0, Math.round((targetTime - now) / 1000)));
+        }
+      } else if (category === "couples") {
+        setCouplesQuestion(serverCouplesQuestion);
+        setCouplesPhase(serverCouplesPhase);
+        setCouplesAnswerer({ id: couplesAnswererId, name: couplesAnswererName });
+        setCouplesGuesser({ id: couplesGuesserId, name: couplesGuesserName });
+        setCouplesReveal(serverCouplesReveal);
+      }
+
+      if (duration > 0) {
+        startTimer(roundEndTime || duration, !!roundEndTime);
+      } else {
+        stopTimer();
+      }
+    });
+
     return () => {
       socket.off("players_updated");
       socket.off("player_joined");
@@ -367,8 +426,9 @@ export default function GamePage() {
       socket.off("room_settings_updated");
       socket.off("kicked_from_room");
       socket.off("error");
+      socket.off("game_sync");
     };
-  }, [socket, startTimer, stopTimer, navigate]);
+  }, [socket, startTimer, stopTimer, navigate, user, serverNow]);
 
   const handleKick = (targetUserId) => {
     if (!socket) return;
