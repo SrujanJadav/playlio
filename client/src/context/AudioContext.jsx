@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 
 const AudioContext = createContext(null);
 
@@ -38,13 +38,15 @@ export function AudioProvider({ children }) {
 
     if (!isMuted && category && audioRef.current.paused) {
       audioRef.current.play().catch((err) => {
-        console.warn("Autoplay blocked, waiting for user interaction:", err);
+        if (err.name !== "AbortError") {
+          console.warn("Autoplay blocked, waiting for user interaction:", err);
+        }
       });
     }
   }, [isMuted, category]);
 
   // Set category and change audio source dynamically
-  const setCategory = (cat) => {
+  const setCategory = useCallback((cat) => {
     setCategoryState(cat);
     if (!audioRef.current) return;
 
@@ -62,7 +64,9 @@ export function AudioProvider({ children }) {
         audioRef.current.src = src;
         if (!isMuted) {
           audioRef.current.play().catch((err) => {
-            console.warn("Audio play blocked by browser:", err);
+            if (err.name !== "AbortError") {
+              console.warn("Audio play blocked by browser:", err);
+            }
           });
         }
       }
@@ -70,11 +74,11 @@ export function AudioProvider({ children }) {
       audioRef.current.pause();
       audioRef.current.src = "";
     }
-  };
+  }, [isMuted]);
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     setIsMuted((prev) => !prev);
-  };
+  }, []);
 
   return (
     <AudioContext.Provider value={{ isMuted, toggleMute, setCategory, category }}>
