@@ -59,6 +59,7 @@ router.post("/create", authMiddleware, async (req, res) => {
           const io = req.app.get("io");
           if (io) {
             io.to(currentRoom.code).emit("room_dissolved", {
+              code: currentRoom.code,
               message: "The game did not start within 2 minutes and has been automatically dissolved. ⏱️"
             });
 

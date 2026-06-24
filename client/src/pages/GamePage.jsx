@@ -168,6 +168,10 @@ export default function GamePage() {
       username: user.username,
       avatar: user.avatar,
     });
+
+    return () => {
+      socket.emit("leave_room", { roomCode: code });
+    };
   }, [socket, user, room, code]);
 
   // ── 3. Socket event listeners ─────────────────────────────────
@@ -327,7 +331,8 @@ export default function GamePage() {
       setIsChoosingWord(false);
     });
 
-    socket.on("room_dissolved", ({ message }) => {
+    socket.on("room_dissolved", ({ code: dissolvedCode, message }) => {
+      if (dissolvedCode && dissolvedCode !== code) return;
       toast.error(message || "Room was dissolved automatically.");
       navigate("/lobby");
     });

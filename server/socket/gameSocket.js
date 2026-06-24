@@ -706,6 +706,12 @@ module.exports = (io) => {
     // ─── JOIN ROOM ───────────────────────────────────────────────
     socket.on("join_room", async ({ roomCode, userId, username, avatar }) => {
       try {
+        // If the socket is already in a different room, leave it first to prevent overlapping channel subscriptions
+        if (socket.data.roomCode && socket.data.roomCode !== roomCode) {
+          console.log(`🧹 Socket ${socket.id} is switching from room ${socket.data.roomCode} to ${roomCode}. Leaving old room.`);
+          await handlePlayerLeave(socket, socket.data.roomCode);
+        }
+
         const room = await Room.findOne({ code: roomCode });
         if (!room) {
           socket.emit("error", { message: "Room not found" });
@@ -889,6 +895,7 @@ module.exports = (io) => {
               if (currentRoom && currentRoom.status !== "finished") {
                 await Room.deleteOne({ _id: currentRoom._id });
                 io.to(roomCode).emit("room_dissolved", {
+                  code: roomCode,
                   message: "Game exceeded 5 minutes and was automatically dissolved. ⏱️"
                 });
                 delete activeGames[roomCode];
@@ -1192,18 +1199,25 @@ module.exports = (io) => {
       handleCouplesSubmit(io, roomCode, game, { userId, selections });
     });
 
-    // ─── DISCONNECT ──────────────────────────────────────────────
-    socket.on("disconnect", async () => {
-      const { roomCode, userId, username } = socket.data;
+    // Helper to handle a player leaving a room cleanly
+    async function handlePlayerLeave(socket, roomCode) {
       if (!roomCode) return;
+      const userId = socket.data.userId;
+      const username = socket.data.username;
 
       try {
         const room = await Room.findOne({ code: roomCode });
         if (!room) return;
 
         room.players = room.players.filter(
-          (p) => p.socketId !== socket.id
+          (p) => p.userId?.toString() !== userId && p.socketId !== socket.id
         );
+        
+        socket.leave(roomCode);
+        if (socket.data.roomCode === roomCode) {
+          socket.data.roomCode = null;
+        }
+
         if (room.players.length === 0) {
           if (room.autoDissolveEmpty) {
             console.log(`⏱️ Room ${roomCode} is empty. Scheduling auto-dissolve in 30 minutes.`);
@@ -1232,7 +1246,20 @@ module.exports = (io) => {
         }
         console.log(`🔌 ${username} left room ${roomCode}`);
       } catch (err) {
-        console.error("disconnect error:", err);
+        console.error("handlePlayerLeave error:", err);
+      }
+    }
+
+    // ─── LEAVE ROOM ──────────────────────────────────────────────
+    socket.on("leave_room", async ({ roomCode }) => {
+      await handlePlayerLeave(socket, roomCode);
+    });
+
+    // ─── DISCONNECT ──────────────────────────────────────────────
+    socket.on("disconnect", async () => {
+      const { roomCode } = socket.data;
+      if (roomCode) {
+        await handlePlayerLeave(socket, roomCode);
       }
     });
   });
