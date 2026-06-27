@@ -4,6 +4,7 @@ import FaultyTerminal from "../components/FaultyTerminal";
 import BackgroundMusic from "../components/BackgroundMusic";
 import Navbar from "../components/Navbar";
 import TargetCursor from "../components/TargetCursor";
+import PixelSpeaker from "../components/PixelSpeaker";
 import { useTheme } from "../context/ThemeContext";
 
 /**
@@ -17,6 +18,7 @@ export default function LobbyLayout() {
   return (
     <div className="min-h-screen flex flex-col items-center w-full" style={{ background: "#0a0612" }}>
       <TargetCursor />
+      <PixelSpeaker />
       <BackgroundMusic category="lobby" />
 
       {/* ── Persistent Background Animations ── */}
