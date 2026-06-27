@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { AudioProvider } from "./context/AudioContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import PixelSpeaker from "./components/PixelSpeaker";
 import ScrollToTop from "./components/ScrollToTop";
 
 import LandingPage     from "./pages/LandingPage";
@@ -52,7 +51,6 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <SocketProvider>
-            <PixelSpeaker />
             <ScrollToTop />
             <AppRoutes />
           </SocketProvider>

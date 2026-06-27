@@ -12,6 +12,7 @@ import CouplesQuizDisplay from "../components/CouplesQuizDisplay";
 import WordSelector from "../components/WordSelector";
 import ChatBox from "../components/ChatBox";
 import PlayersSidebar from "../components/PlayersSidebar";
+import PixelSpeaker from "../components/PixelSpeaker";
 import BackgroundMusic, { useBgm } from "../components/BackgroundMusic";
 import Silk from "../components/Silk";
 import safariBg from "./assets/safari-bg.webp";
@@ -824,22 +825,7 @@ export default function GamePage() {
           {/* Round + timer */}
           <div className="flex items-center gap-3">
             {/* Music toggle — inline, to the left of Round text */}
-            {bgmToggle && (
-              <button
-                onClick={bgmToggle}
-                className="btn-bounce w-8 h-8 rounded-full flex items-center justify-center text-sm cursor-pointer"
-                style={{
-                  background: "rgba(255, 255, 255, 0.05)",
-                  border: "1.5px solid rgba(200, 168, 255, 0.25)",
-                  color: "#f0e0ff",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                  flexShrink: 0,
-                }}
-                title={bgmPlaying ? "Mute music" : "Unmute music"}
-              >
-                {bgmPlaying ? "🔊" : "🔇"}
-              </button>
-            )}
+            <PixelSpeaker inline={true} />
             <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.6)" }}>
               Round {round}/{totalRounds}
             </span>

@@ -1,7 +1,7 @@
 import { useAudio } from "../context/AudioContext";
 import "./PixelSpeaker.css";
 
-export default function PixelSpeaker() {
+export default function PixelSpeaker({ inline = false }) {
   const { isMuted, toggleMute, category } = useAudio();
 
   // If no category is playing, don't show the speaker button
@@ -11,7 +11,7 @@ export default function PixelSpeaker() {
   return (
     <button
       onClick={toggleMute}
-      className={`pixel-speaker-btn ${isMuted ? "muted" : "unmuted"}`}
+      className={`pixel-speaker-btn ${inline ? "pixel-speaker-inline" : ""} ${isMuted ? "muted" : "unmuted"}`}
       title={isMuted ? "Unmute Background Music" : "Mute Background Music"}
     >
       <div className="pixel-speaker-icon-wrapper">

@@ -77,3 +77,19 @@
 .muted .wave-group-3 {
   transform: translate(0.5px, 0px) rotate(-45deg);
 }
+
+.pixel-speaker-btn.pixel-speaker-inline {
+  position: static !important;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  z-index: auto;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(200, 168, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.pixel-speaker-btn.pixel-speaker-inline .pixel-speaker-icon-wrapper {
+  width: 20px;
+  height: 20px;
+}
