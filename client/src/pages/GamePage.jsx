@@ -824,18 +824,18 @@ export default function GamePage() {
           {/* Round + timer */}
           <div className="flex items-center gap-3">
             {/* Music toggle — inline, to the left of Round text */}
-            {AudioElement && (
+            {bgmToggle && (
               <button
                 onClick={bgmToggle}
-                className="btn-bounce w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                className="btn-bounce w-8 h-8 rounded-full flex items-center justify-center text-sm cursor-pointer"
                 style={{
-                  background: "var(--pastel-purple)",
-                  border: "1.5px solid #c8a8ff",
-                  color: "var(--ink)",
-                  boxShadow: "var(--shadow-soft)",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1.5px solid rgba(200, 168, 255, 0.25)",
+                  color: "#f0e0ff",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
                   flexShrink: 0,
                 }}
-                title={bgmPlaying ? "Pause music" : "Play music"}
+                title={bgmPlaying ? "Mute music" : "Unmute music"}
               >
                 {bgmPlaying ? "🔊" : "🔇"}
               </button>
