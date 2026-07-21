@@ -121,7 +121,15 @@ export default function LobbyPage() {
   useEffect(() => {
     refreshUser();
     fetchPublicRooms();
-  }, []);
+
+    try {
+      const pendingCode = sessionStorage.getItem("pending_room_code");
+      if (pendingCode) {
+        sessionStorage.removeItem("pending_room_code");
+        navigate(`/game/${pendingCode.trim().toUpperCase()}`);
+      }
+    } catch {}
+  }, [navigate]);
 
   const fetchPublicRooms = async () => {
     try {
@@ -155,7 +163,15 @@ export default function LobbyPage() {
         musicAnswerTime,
         musicGenre,
       });
-      toast.success(`Room ${data.code} created! 🎉`);
+
+      const shareUrl = `${window.location.origin}/join/${data.code}`;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success(`Room ${data.code} created & link copied! 📋🎉`);
+      } catch {
+        toast.success(`Room ${data.code} created! 🎉`);
+      }
+
       navigate(`/game/${data.code}`);
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to create room");
@@ -869,18 +885,41 @@ export default function LobbyPage() {
                           <PixelEmoji>👤</PixelEmoji> {room.host?.username} · <PixelEmoji>🧑‍🤝‍🧑</PixelEmoji> {room.players.length}/{room.maxPlayers}
                         </p>
                       </div>
-                      <PixelButton
-                        onClick={() => navigate(`/game/${room.code}`)}
-                        background={`linear-gradient(135deg,${cc.border}18,${cc.border}35)`}
-                        borderColor={cc.border}
-                        textColor={cc.border}
-                        className="w-full text-xs mt-2"
-                        style={{ padding: "8px" }}
-                      >
-                        <span className="flex items-center gap-1.5 justify-center">
-                          Join Room <PixelEmoji>🎮</PixelEmoji>
-                        </span>
-                      </PixelButton>
+                      <div className="flex items-center gap-2 mt-2" style={{ zIndex: 1 }}>
+                        <PixelButton
+                          onClick={() => navigate(`/game/${room.code}`)}
+                          background={`linear-gradient(135deg,${cc.border}18,${cc.border}35)`}
+                          borderColor={cc.border}
+                          textColor={cc.border}
+                          className="flex-1 text-xs"
+                          style={{ padding: "8px" }}
+                        >
+                          <span className="flex items-center gap-1.5 justify-center">
+                            Join Room <PixelEmoji>🎮</PixelEmoji>
+                          </span>
+                        </PixelButton>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const shareUrl = `${window.location.origin}/join/${room.code}`;
+                            try {
+                              await navigator.clipboard.writeText(shareUrl);
+                              toast.success(`Copied invite link for ${room.code}! 📋`);
+                            } catch {
+                              toast.error("Failed to copy link");
+                            }
+                          }}
+                          className="px-3 py-2 rounded-lg font-body text-xs flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                          style={{
+                            background: "rgba(255,255,255,0.08)",
+                            border: `1px solid ${cc.border}44`,
+                            color: "#f0e0ff",
+                          }}
+                          title="Copy Shareable Lobby Link"
+                        >
+                          🔗
+                        </button>
+                      </div>
                     </PixelPanel>
                   );
                 })}

@@ -54,10 +54,34 @@ const MODE_CARDS = [
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [invitedCode, setInvitedCode] = useState(null);
 
-  // Already logged in → skip to lobby
+  // Check URL or sessionStorage for pending room invitation
   useEffect(() => {
-    if (!loading && user) navigate("/lobby");
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlCode = searchParams.get("room");
+      const storedCode = sessionStorage.getItem("pending_room_code");
+      const targetCode = (urlCode || storedCode || "").trim().toUpperCase();
+
+      if (targetCode) {
+        sessionStorage.setItem("pending_room_code", targetCode);
+        setInvitedCode(targetCode);
+      }
+    } catch {}
+  }, []);
+
+  // Already logged in → skip to lobby (or target room)
+  useEffect(() => {
+    if (!loading && user) {
+      const pendingCode = sessionStorage.getItem("pending_room_code");
+      if (pendingCode) {
+        sessionStorage.removeItem("pending_room_code");
+        navigate(`/game/${pendingCode.trim().toUpperCase()}`);
+      } else {
+        navigate("/lobby");
+      }
+    }
   }, [user, loading, navigate]);
 
   const handleGoogleLogin = () => {
@@ -174,14 +198,40 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center w-full"
+          className="flex flex-col items-center w-full max-w-md mx-auto"
           style={{ marginTop: "16px", marginBottom: "10px" }}
         >
+          {invitedCode && (
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-full p-4 mb-6 rounded-2xl text-center relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, rgba(57,255,136,0.15), rgba(124,77,255,0.15))",
+                border: "2px solid #39ff88",
+                boxShadow: "0 0 25px rgba(57,255,136,0.3)",
+              }}
+            >
+              <div className="flex items-center justify-center gap-2 text-[#39ff88] font-display text-sm mb-1 tracking-wider">
+                <span>🎮</span> ROOM INVITATION RECEIVED
+              </div>
+              <p className="font-body text-xs text-white/80 mb-2">
+                You've been invited to join game room:
+              </p>
+              <div className="font-display text-3xl tracking-widest text-[#39ff88] drop-shadow-[0_0_10px_rgba(57,255,136,0.8)] mb-2">
+                {invitedCode}
+              </div>
+              <p className="font-body text-xs text-[#c8a8ff]">
+                Sign in with an account below to jump straight into this lobby! 👇
+              </p>
+            </motion.div>
+          )}
+
           <PixelButton
             onClick={handleGoogleLogin}
             background="linear-gradient(135deg,#39ff88,#7c4dff)"
             borderColor="#0a0612"
-            className="flex items-center gap-4 px-12 py-5 text-base font-bold sm:px-16 sm:py-6 sm:text-lg"
+            className="flex items-center gap-4 px-12 py-5 text-base font-bold sm:px-16 sm:py-6 sm:text-lg w-full justify-center"
             style={{ fontFamily: "'VT323', monospace", fontSize: "1.5rem" }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24">
@@ -192,6 +242,16 @@ export default function LandingPage() {
             </svg>
             Continue with Google
           </PixelButton>
+
+          {import.meta.env.DEV && (
+            <button
+              onClick={() => { window.location.href = "/api/auth/dev-login"; }}
+              className="mt-3 font-body text-xs underline cursor-pointer hover:text-white"
+              style={{ color: "#39ff88" }}
+            >
+              ⚡ Fast Dev Login (Localhost testing)
+            </button>
+          )}
 
           <p className="mt-4 font-body text-xs" style={{ color: "#a890c8", opacity: 0.8 }}>
             No password needed · Free forever · Join in 5 seconds

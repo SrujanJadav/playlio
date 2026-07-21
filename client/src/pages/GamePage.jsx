@@ -534,11 +534,26 @@ export default function GamePage() {
               );
             })}
 
-            <button onClick={() => navigate("/lobby")}
-              className="btn-bounce mt-6 w-full py-3 rounded-2xl font-display text-lg cursor-pointer"
-              style={{ background: `linear-gradient(135deg, ${cat.border}, #7c4dff)`, color: "#0a0612", border: "none", fontWeight: "bold" }}>
-              Back to Lobby 🏠
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <button onClick={() => navigate("/lobby")}
+                className="btn-bounce flex-1 py-3 rounded-2xl font-display text-lg cursor-pointer"
+                style={{ background: `linear-gradient(135deg, ${cat.border}, #7c4dff)`, color: "#0a0612", border: "none", fontWeight: "bold" }}>
+                Back to Lobby 🏠
+              </button>
+              <button
+                onClick={async () => {
+                  const shareUrl = `${window.location.origin}/join/${code}`;
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    toast.success("Lobby link copied for rematch! 📋");
+                  } catch {}
+                }}
+                className="btn-bounce px-4 py-3 rounded-2xl font-display text-base cursor-pointer flex items-center justify-center gap-1.5"
+                style={{ background: "rgba(255,255,255,0.08)", color: "#f0e0ff", border: `1.5px solid ${cat.border}44` }}
+              >
+                <span>🔗</span> Rematch Link
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -575,18 +590,85 @@ export default function GamePage() {
             <div className="text-5xl float mb-3" style={{ filter: `drop-shadow(0 0 8px ${cat.border})` }}>🎪</div>
             <h1 className="font-display text-3xl mb-1" style={{ color: "#f0e0ff" }}>Waiting Room</h1>
 
-            {/* Room code */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl mt-2 mb-6"
-              style={{ background: "rgba(255,255,255,0.03)", border: `1.5px solid ${cat.border}33` }}>
-              <span className="font-body text-sm" style={{ color: "rgba(240,224,255,0.6)" }}>Room code:</span>
-              <span className="font-display text-2xl tracking-widest text-glow-soft" style={{ color: cat.border }}>
-                {code}
-              </span>
-              <button onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied!"); }}
-                className="btn-bounce text-xs px-2 py-0.5 rounded-lg font-body"
-                style={{ background: "rgba(200,168,255,0.1)", color: "#f0e0ff", border: `1px solid ${cat.border}33`, cursor: "pointer" }}>
-                Copy
-              </button>
+            {/* Share / Invite Hub */}
+            <div className="w-full p-4 mt-3 mb-6 rounded-2xl flex flex-col items-center gap-3"
+              style={{ background: "rgba(255,255,255,0.02)", border: `1.5px solid ${cat.border}44` }}>
+              <div className="flex flex-wrap items-center justify-center gap-3 w-full">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: "rgba(0,0,0,0.3)", border: `1px solid ${cat.border}33` }}>
+                  <span className="font-body text-xs text-white/60">Code:</span>
+                  <span className="font-display text-xl tracking-widest" style={{ color: cat.border }}>{code}</span>
+                  <button onClick={() => { navigator.clipboard.writeText(code); toast.success("Code copied! 📋"); }}
+                    className="btn-bounce text-xs px-2 py-0.5 rounded font-body cursor-pointer"
+                    style={{ background: `${cat.border}22`, color: "#f0e0ff", border: `1px solid ${cat.border}44` }}>
+                    Copy Code
+                  </button>
+                </div>
+
+                <button
+                  onClick={async () => {
+                    const shareUrl = `${window.location.origin}/join/${code}`;
+                    try {
+                      await navigator.clipboard.writeText(shareUrl);
+                      toast.success("Lobby invite link copied! Send it to your friends 🚀");
+                    } catch {
+                      toast.error("Failed to copy link");
+                    }
+                  }}
+                  className="btn-bounce px-4 py-2 rounded-xl font-body text-sm font-bold flex items-center gap-2 cursor-pointer shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${cat.border}, #7c4dff)`,
+                    color: "#0a0612",
+                    border: "none",
+                  }}
+                >
+                  <span>🔗</span> Copy Lobby Link
+                </button>
+
+                {typeof navigator !== "undefined" && navigator.share && (
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/join/${code}`;
+                      navigator.share({
+                        title: `Join my ${cat.label} game on Plaxlio!`,
+                        text: `Hey! Join my multiplayer ${cat.label} lobby on Plaxlio (Code: ${code}):`,
+                        url: shareUrl,
+                      }).catch(() => {});
+                    }}
+                    className="btn-bounce px-3 py-2 rounded-xl font-body text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                    style={{ background: "rgba(255,255,255,0.08)", color: "#f0e0ff", border: "1px solid rgba(255,255,255,0.2)" }}
+                  >
+                    <span>📲</span> Share
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <span className="font-body text-xs text-white/40">Quick Share:</span>
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Join my ${cat.label} lobby on Plaxlio! 🎮\nCode: ${code}\nLink: ${window.location.origin}/join/${code}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2 py-1 rounded bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/40 hover:scale-105 transition-transform"
+                >
+                  WhatsApp
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Play ${cat.label} with me on Plaxlio! 🎮`)}&url=${encodeURIComponent(`${window.location.origin}/join/${code}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2 py-1 rounded bg-[#1DA1F2]/20 text-[#1DA1F2] border border-[#1DA1F2]/40 hover:scale-105 transition-transform"
+                >
+                  X / Twitter
+                </a>
+                <a
+                  href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}/join/${code}`)}&text=${encodeURIComponent(`Join my ${cat.label} room on Plaxlio!`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2 py-1 rounded bg-[#0088cc]/20 text-[#0088cc] border border-[#0088cc]/40 hover:scale-105 transition-transform"
+                >
+                  Telegram
+                </a>
+              </div>
             </div>
 
             <div className="mb-4 text-sm font-body" style={{ color: "rgba(240,224,255,0.5)" }}>
@@ -780,6 +862,22 @@ export default function GamePage() {
               style={{ background: `${cat.border}22`, color: cat.border, border: `1.5px solid ${cat.border}44` }}>
               {cat.label}
             </span>
+            <button
+              onClick={async () => {
+                const shareUrl = `${window.location.origin}/join/${code}`;
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
+                  toast.success("Lobby invite link copied! 📋");
+                } catch {
+                  toast.error("Failed to copy link");
+                }
+              }}
+              className="px-2.5 py-1 rounded-full text-xs font-body flex items-center gap-1 cursor-pointer transition-all hover:scale-105"
+              style={{ background: "rgba(255,255,255,0.08)", color: "#f0e0ff", border: "1px solid rgba(255,255,255,0.2)" }}
+              title="Copy Shareable Lobby Link"
+            >
+              🔗 Invite
+            </button>
           </div>
 
           {/* Word / blanks / quiz prompt */}

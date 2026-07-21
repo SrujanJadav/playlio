@@ -15,12 +15,24 @@ const LobbyPage       = lazy(() => import("./pages/LobbyPage"));
 const GamePage        = lazy(() => import("./pages/GamePage"));
 const ProfilePage     = lazy(() => import("./pages/ProfilePage"));
 const LeaderboardPage = lazy(() => import("./pages/LeaderboardPage"));
+const JoinPage        = lazy(() => import("./pages/JoinPage"));
 
 // Guard: redirects to / if not logged in
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
-  if (!user)   return <Navigate to="/" replace />;
+  if (!user) {
+    // If user attempted to navigate directly to /game/:code, save code to sessionStorage
+    const pathMatch = window.location.pathname.match(/\/game\/([A-Za-z0-9]+)/);
+    if (pathMatch && pathMatch[1]) {
+      const roomCode = pathMatch[1].toUpperCase();
+      try {
+        sessionStorage.setItem("pending_room_code", roomCode);
+      } catch {}
+      return <Navigate to={`/?room=${roomCode}`} replace />;
+    }
+    return <Navigate to="/" replace />;
+  }
   return children;
 }
 
@@ -32,6 +44,7 @@ function AppRoutes() {
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path="/"            element={<LandingPage />} />
+        <Route path="/join/:code"  element={<JoinPage />} />
         {/* Lobby/Leaderboard/Profile share a persistent background layout */}
         <Route element={<ProtectedRoute><LobbyLayout /></ProtectedRoute>}>
           <Route path="/lobby"       element={<LobbyPage />} />
